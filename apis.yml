@@ -1,0 +1,64 @@
+aid: ing-australia
+url: https://raw.githubusercontent.com/api-evangelist/ing-australia/refs/heads/main/apis.yml
+name: ING Australia
+kind: company
+description: ING Australia is the retail banking division of ING Bank (Australia) Limited
+  (ABN 24 000 893 292), a wholly owned subsidiary of the Dutch multinational ING Groep
+  N.V. headquartered in Amsterdam. Launched in 1999 as ING Direct and rebranded to
+  ING in 2017, it is a branchless, digital-first direct bank offering everyday transaction
+  and savings accounts, home loans, superannuation, and insurance to Australian consumers.
+  It is not a customer-owned mutual; it is a foreign-owned Authorised Deposit-taking
+  Institution (ADI) regulated by APRA and ASIC. As an active ADI, ING is an accredited
+  data holder under Australia's Consumer Data Right (CDR / Open Banking) and exposes
+  the mandatory public, unauthenticated Product Reference Data (PRD) API conforming
+  to the Consumer Data Standards (CDS). Authenticated consumer-data sharing follows
+  the CDR ecosystem model (OAuth2 / OIDC FAPI profile via accredited data recipients);
+  ING does not operate a broad, self-serve public developer portal.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+tags:
+- Financial
+- Banks
+- Open Banking
+- CDR
+- Consumer Banking
+- Australia
+- Product Reference Data
+- ADI
+created: '2026-07-20'
+modified: '2026-07-20'
+specificationVersion: '0.19'
+apis:
+- aid: ing-australia:ing-australia-cdr-product-reference-data-api
+  name: ING Australia CDR Product Reference Data API
+  tags:
+  - CDR
+  - Open Banking
+  - Product Reference Data
+  - Banking
+  - Consumer Data Standards
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.ing.com.au/
+  baseURL: https://id.ob.ing.com.au/cds-au/v1
+  properties:
+  - url: https://www.ing.com.au/pdf/CDR-policy.pdf
+    type: Documentation
+  - url: https://consumerdatastandardsaustralia.github.io/standards/#product-reference-data-apis
+    type: APIReference
+  - url: openapi/ing-australia-cds-banking-products-openapi.yml
+    type: OpenAPI
+  description: Public, unauthenticated Product Reference Data (PRD) API mandated under
+    Australia's Consumer Data Right. Exposes GET /banking/products (a paginated list
+    of ING's publicly offered banking products) and GET /banking/products/{productId}
+    (full product detail) under the Consumer Data Standards (CDS) path /cds-au/v1.
+    Responses are versioned via the x-v request/response header. The base URI is ING
+    Bank (Australia) Ltd's registered CDR publicBaseUri per the CDR Register.
+common:
+- type: Website
+  url: https://www.ing.com.au/
+- type: Documentation
+  url: https://www.ing.com.au/pdf/CDR-policy.pdf
+- type: APIReference
+  url: https://consumerdatastandardsaustralia.github.io/standards/
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

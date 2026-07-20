@@ -1,0 +1,87 @@
+aid: ing-australia
+name: ING Australia
+review:
+  question: Does ING Australia expose a confirmed public API surface, and is it a bank-proprietary contract or the shared CDR standard?
+  answer: true
+  date: '2026-07-20'
+  reviewer: API Evangelist
+  cdrPrdConfirmed: true
+  cdrBaseUri: https://id.ob.ing.com.au/cds-au/v1
+  specProvenance: DSB Consumer Data Standards (shared) — not bank-proprietary
+findings:
+  summary: |
+    ING Australia (ING Bank (Australia) Limited, ABN 24 000 893 292) exposes
+    exactly one confirmed public, unauthenticated API surface: the Consumer
+    Data Right (CDR / Open Banking) Product Reference Data (PRD) API. Its base
+    URI was resolved from the authoritative CDR Register (Get Data Holder
+    Brands Summary), which lists brand "ING BANK (Australia) Ltd" with
+    publicBaseUri https://id.ob.ing.com.au (lastUpdated 2026-07-16). A live GET
+    against https://id.ob.ing.com.au/cds-au/v1/banking/products returned HTTP
+    200 with response header x-v: 5 and a data.products array of 13 publicly
+    offered products (Savings Maximiser, Orange Everyday, Mortgage Simplifier,
+    Orange One credit cards, term deposits, ING Personal Loan, etc.). An
+    initial request with x-v: 3 was correctly rejected HTTP 406 with x-v: 5,
+    confirming genuine CDS version negotiation rather than a static stub.
+
+    ING does NOT operate a broad, self-serve public developer portal (no
+    developer.ing.com.au equivalent, and nothing like Up Bank's full personal
+    -banking developer API). The only public developer-facing artifacts are
+    the CDR PRD endpoint above and ING's published CDR Policy PDF. All richer
+    consumer-data endpoints (accounts, transactions, balances, payees, direct
+    debits) are NOT public: they require the authenticated CDR data-sharing
+    model, accessible only to CDR-accredited Data Recipients (ADRs) via the
+    consent + OAuth2 / OIDC FAPI security profile brokered through ING's CDR
+    authorization server. There is no self-issued API key or public developer
+    signup for those endpoints.
+
+    Spec provenance: no bank-proprietary OpenAPI is published by ING. The
+    harvested contract is the shared Data Standards Body (DSB) Consumer Data
+    Standards "CDR Banking API" OpenAPI 3.0.3 (version 1.36.0), captured
+    verbatim (JSON faithfully serialized to YAML) at
+    openapi/ing-australia-cds-banking-products-openapi.yml. It describes the
+    /banking/products and /banking/products/{productId} operations (plus the
+    authenticated banking operations that ING implements to the same standard).
+    It is the ecosystem-wide contract every Australian ADI conforms to, NOT an
+    ING-authored document.
+  transports:
+    - protocol: REST
+      scheme: https
+      baseURL: https://id.ob.ing.com.au/cds-au/v1
+      documented: true
+      note: CDS-compliant Product Reference Data API; unauthenticated; version negotiated via x-v header (current x-v 5).
+  endpointsConfirmedPublic:
+    - GET https://id.ob.ing.com.au/cds-au/v1/banking/products
+    - GET https://id.ob.ing.com.au/cds-au/v1/banking/products/{productId}
+  authModel:
+    publicPrd: none (unauthenticated, mandated open data)
+    consumerDataSharing: OAuth2 / OIDC FAPI (CDR security profile), consent-driven, restricted to accredited Data Recipients (ADRs)
+  developerPortal: none (no public self-serve developer portal; CDR data holder only)
+  liveProbe:
+    url: https://id.ob.ing.com.au/cds-au/v1/banking/products
+    statusWithXv3: 406
+    statusWithXv5: 200
+    xvResponseHeader: '5'
+    productCount: 13
+sources:
+  - url: https://api.cdr.gov.au/cdr-register/v1/banking/data-holders/brands/summary
+    type: APIReference
+    note: Authoritative CDR Register; brand "ING BANK (Australia) Ltd", ABN 24000893292, publicBaseUri https://id.ob.ing.com.au (HTTP 200).
+  - url: https://id.ob.ing.com.au/cds-au/v1/banking/products
+    type: APIReference
+    note: Live CDR PRD endpoint; HTTP 200 with x-v 5, 13 products (verified 2026-07-20).
+  - url: https://www.ing.com.au/pdf/CDR-policy.pdf
+    type: Documentation
+    note: ING's published Consumer Data Right policy (HTTP 200).
+  - url: https://consumerdatastandardsaustralia.github.io/standards/
+    type: APIReference
+    note: DSB Consumer Data Standards — the shared contract ING's PRD conforms to (HTTP 200).
+  - url: https://raw.githubusercontent.com/ConsumerDataStandardsAustralia/standards/master/swagger-gen/api/cds_banking.json
+    type: OpenAPI
+    note: Source of harvested DSB CDR Banking API OpenAPI 3.0.3 v1.36.0 (shared standard, not ING-proprietary).
+actions:
+  openapiPath: openapi/ing-australia-cds-banking-products-openapi.yml
+  apisYmlUpdated: true
+  reason: |
+    Captured ING's confirmed public CDR PRD surface and harvested the shared
+    DSB CDS banking OpenAPI as the governing contract, clearly labeled as the
+    Consumer Data Standards baseline rather than a bank-proprietary spec.
