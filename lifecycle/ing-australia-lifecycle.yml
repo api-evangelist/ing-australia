@@ -1,0 +1,38 @@
+generated: '2026-07-20'
+method: searched
+source: >-
+  openapi/ing-australia-cds-banking-products-openapi.yml +
+  https://consumerdatastandardsaustralia.github.io/standards/
+description: >-
+  Versioning and deprecation posture for ING Australia's CDS Banking API. ING
+  implements the Consumer Data Standards, whose versioning and endpoint
+  decommissioning are governed centrally by the Data Standards Body and rolled out
+  to data holders on the CDR Future Dated Obligations schedule.
+versioning:
+  scheme: per-endpoint header (x-v / x-min-v)
+  standards_version: '1.36.0'
+  docs: https://consumerdatastandardsaustralia.github.io/standards/#versioning
+  note: >-
+    Each endpoint is independently versioned; the current version is declared per
+    operation (x-version). New endpoint versions are additive and negotiated via the
+    x-v header, so multiple versions run concurrently.
+deprecation:
+  policy: true
+  mechanism: endpoint-version obsolescence
+  docs: https://consumerdatastandardsaustralia.github.io/standards/#future-dated-obligations
+  note: >-
+    Superseded endpoint versions are marked obsolete and retired on the CDS
+    maintenance / Future Dated Obligations schedule. The spec references the obsolete
+    prior versions of every endpoint (e.g. Get Products v1-v4, Get Account Detail
+    v1-v4). Product effective/obsolete windows are also signalled via the product
+    effectiveFrom/effectiveTo fields rather than deletions.
+obsolete_endpoint_versions:
+  note: Every operation in the spec documents its retired prior versions inline (includes/obsolete/*).
+sla:
+  docs: https://consumerdatastandardsaustralia.github.io/standards/#non-functional-requirements
+  note: >-
+    Availability and performance targets for CDR data holders are defined by the CDS
+    Non-Functional Requirements (e.g. 99.5% availability targets, performance tiers)
+    rather than a per-provider SLA page.
+status_page: null
+deprecated_operations: []

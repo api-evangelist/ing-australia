@@ -1,0 +1,83 @@
+generated: '2026-07-20'
+method: derived
+source: openapi/ing-australia-cds-banking-products-openapi.yml
+docs: https://consumerdatastandardsaustralia.github.io/standards/#error-codes
+format: cdr-error-codes
+envelope:
+  schema: ResponseErrorListV2
+  fields: ['errors[].code', 'errors[].title', 'errors[].detail', 'errors[].meta.urn']
+  description: >-
+    CDR standardised errors are returned as an array under `errors`. Each error
+    carries a URN `code`, a stable `title`, an occurrence-specific `detail`, and an
+    optional `meta.urn` when a data-holder-specific code extends a standard one.
+    This is the Consumer Data Standards error format (not RFC 9457
+    application/problem+json).
+description: >-
+  Error catalogue derived from the 4xx responses declared across the CDS Banking
+  operations, mapped to the Consumer Data Standards standardised error code URNs.
+  No 5xx responses are declared in the spec.
+problems:
+  - status: 400
+    code: urn:au-cds:error:cds-all:Field/Invalid
+    title: Invalid Field
+    detail: A supplied field value failed validation.
+  - status: 400
+    code: urn:au-cds:error:cds-all:Field/Missing
+    title: Missing Required Field
+    detail: A required field was not supplied.
+  - status: 400
+    code: urn:au-cds:error:cds-all:Header/Missing
+    title: Missing Required Header
+    detail: A required HTTP header (e.g. x-v) was not supplied.
+  - status: 400
+    code: urn:au-cds:error:cds-all:Header/InvalidVersion
+    title: Invalid Version
+    detail: The x-v / x-min-v header value is not a valid positive integer.
+  - status: 400
+    code: urn:au-cds:error:cds-all:Field/InvalidPageSize
+    title: Invalid Page Size
+    detail: The page-size parameter is outside the allowed range.
+  - status: 400
+    code: urn:au-cds:error:cds-all:Field/InvalidDateTime
+    title: Invalid Date
+    detail: A supplied date/time field is not a valid DateTimeString.
+    source_operations: [listBankingTransactions, getBankingTransactionDetail]
+  - status: 404
+    code: urn:au-cds:error:cds-all:Authorisation/UnavailableBankingAccount
+    title: Unavailable Banking Account
+    detail: The requested account is not available to the current authorisation.
+  - status: 404
+    code: urn:au-cds:error:cds-all:Authorisation/InvalidBankingAccount
+    title: Invalid Banking Account
+    detail: The supplied accountId is invalid.
+  - status: 404
+    code: urn:au-cds:error:cds-all:Resource/NotImplemented
+    title: Resource Not Implemented
+    detail: The requested resource (e.g. instalment plans) is not implemented for the account.
+    source_operations: [listInstalmentPlans, listInstalmentPlansBulk]
+  - status: 404
+    code: urn:au-cds:error:cds-all:Resource/Unavailable
+    title: Unavailable Resource
+    detail: The requested resource is not available.
+    source_operations: [getBankingTransactionDetail]
+  - status: 404
+    code: urn:au-cds:error:cds-all:Resource/Invalid
+    title: Invalid Resource
+    detail: The requested resource identifier is invalid.
+    source_operations: [getBankingTransactionDetail]
+  - status: 406
+    code: urn:au-cds:error:cds-all:Header/UnsupportedVersion
+    title: Unsupported Version
+    detail: None of the requested endpoint versions (x-min-v..x-v) are supported.
+  - status: 422
+    code: urn:au-cds:error:cds-all:Field/InvalidPage
+    title: Invalid Page
+    detail: The requested page is out of range.
+  - status: 422
+    code: urn:au-cds:error:cds-all:Authorisation/UnavailableBankingAccount
+    title: Unavailable Banking Account
+    detail: One or more requested accounts (bulk/POST endpoints) are unavailable to the authorisation.
+  - status: 422
+    code: urn:au-cds:error:cds-all:Authorisation/InvalidBankingAccount
+    title: Invalid Banking Account
+    detail: One or more supplied accountId values (bulk/POST endpoints) are invalid.

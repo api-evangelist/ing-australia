@@ -1,0 +1,28 @@
+generated: '2026-07-20'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.ing.com.au
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct  8 03:06:20 2026 GMT
+  hsts: true
+  hsts_max_age: 16070400
+- host: id.ob.ing.com.au
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Nov 26 04:25:38 2026 GMT
+  hsts: null
+domains:
+- domain: ing.com.au
+  dnssec: false
+  caa:
+  - 0 issue "identrust.com"
+  - 0 issuewild "identrust.com"
+  - 0 iodef "mailto:ing.certificate.management@ing.com"
+  - 0 issue "swisssign.com"
+  - 0 issuewild "entrust.net"
+  - 0 issuewild "swisssign.com"
+  spf: true
+  dmarc: true
+  dmarc_policy: reject

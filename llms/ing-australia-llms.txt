@@ -1,0 +1,33 @@
+# ING Australia
+
+> ING Australia is the retail banking division of ING Bank (Australia) Limited, a digital-first direct bank and an accredited data holder under Australia's Consumer Data Right (CDR / Open Banking). It exposes the mandatory public, unauthenticated Product Reference Data (PRD) API plus the full authenticated CDS Banking surface (accounts, balances, transactions, direct debits, scheduled payments, payees) accessible to Accredited Data Recipients under the FAPI 1.0 Advanced security profile. ING does not run a broad self-serve public developer portal.
+
+## APIs
+- [ING Australia CDR Product Reference Data / CDS Banking API](https://www.ing.com.au/): Consumer Data Standards Banking API. Public base URI https://id.ob.ing.com.au/cds-au/v1.
+
+## Specs
+- [OpenAPI (CDS Banking v1.36.0)](openapi/ing-australia-cds-banking-products-openapi.yml)
+- [OpenAPI Overlay (AE enhancements)](overlays/ing-australia-cds-banking-products-overlay.yaml)
+
+## Auth & security
+- [Authentication profile (FAPI 1.0 Advanced)](authentication/ing-australia-authentication.yml)
+- [OAuth scopes](scopes/ing-australia-scopes.yml)
+- [OpenID Provider metadata (live)](well-known/ing-australia-openid-configuration.json)
+- [Well-known index](well-known/ing-australia-well-known.yml)
+- [Domain security probe](security/ing-australia-domain-security.yml)
+
+## Semantics
+- [API conventions](conventions/ing-australia-conventions.yml)
+- [Error catalogue (CDR error codes)](errors/ing-australia-problem-types.yml)
+- [Lifecycle & versioning](lifecycle/ing-australia-lifecycle.yml)
+- [Conformance (FAPI/OAuth2/OIDC/CDS)](conformance/ing-australia-conformance.yml)
+- [Data model](data-model/ing-australia-data-model.yml)
+
+## Agents
+- [MCP candidate tools](mcp/ing-australia-mcp.yml)
+- [Agent skills index](skills/_index.yml)
+- [Agentic access contracts](agentic-access/ing-australia-agentic-access.yml)
+
+## Docs
+- [ING CDR policy](https://www.ing.com.au/pdf/CDR-policy.pdf)
+- [Consumer Data Standards (Banking)](https://consumerdatastandardsaustralia.github.io/standards/#product-reference-data-apis)

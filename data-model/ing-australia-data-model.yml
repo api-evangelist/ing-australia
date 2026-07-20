@@ -1,0 +1,74 @@
+generated: '2026-07-20'
+method: derived
+source: openapi/ing-australia-cds-banking-products-openapi.yml
+description: >-
+  Entity-relationship graph derived from the CDS Banking schemas and id-reference
+  fields. The account is the hub: balances, transactions, direct debits, scheduled
+  payments and instalment plans all belong to an account via accountId. Products are
+  the public, unauthenticated catalogue and (by design in CDR) are NOT hard-linked
+  to accounts — productCategory is the only shared field, there is no product->account
+  foreign key.
+entities:
+  - name: BankingProduct
+    id: productId
+    id_type: data-holder specific (ASCIIString, not permanence-bound)
+    scope: public / unauthenticated
+    operations: [listBankingProducts, getBankingProductDetail]
+  - name: BankingAccount
+    id: accountId
+    id_type: CDR ID-permanent (ASCIIString)
+    operations: [listBankingAccounts, getBankingAccountDetail]
+  - name: BankingBalance
+    operations: [listBankingBalancesBulk, listBankingBalancesSpecificAccounts, getBankingBalance]
+  - name: BankingTransaction
+    id: transactionId
+    id_type: CDR ID-permanent (ASCIIString)
+    operations: [listBankingTransactions, getBankingTransactionDetail]
+  - name: BankingDirectDebitAuthorisation
+    operations: [listDirectDebits, listDirectDebitsBulk, listDirectDebitsSpecificAccounts]
+  - name: BankingScheduledPayment
+    id: scheduledPaymentId
+    id_type: CDR ID-permanent (ASCIIString)
+    operations: [listScheduledPayments, listScheduledPaymentsBulk, listScheduledPaymentsSpecificAccounts]
+  - name: BankingInstalmentPlan
+    id: instalmentPlanId
+    id_type: CDR ID-permanent (ASCIIString)
+    operations: [listInstalmentPlans, listInstalmentPlansBulk]
+  - name: BankingPayee
+    id: payeeId
+    id_type: CDR ID-permanent (ASCIIString)
+    operations: [listBankingPayees, getBankingPayeeDetail]
+relationships:
+  - from: BankingBalance
+    to: BankingAccount
+    type: belongs_to
+    via: accountId
+  - from: BankingTransaction
+    to: BankingAccount
+    type: belongs_to
+    via: accountId
+  - from: BankingDirectDebitAuthorisation
+    to: BankingAccount
+    type: belongs_to
+    via: accountId
+  - from: BankingScheduledPayment
+    to: BankingAccount
+    type: belongs_to
+    via: accountId
+  - from: BankingInstalmentPlan
+    to: BankingAccount
+    type: belongs_to
+    via: accountId
+  - from: BankingAccount
+    to: BankingTransaction
+    type: has_many
+    via: accountId
+  - from: BankingAccount
+    to: BankingScheduledPayment
+    type: has_many
+    via: accountId
+  - from: BankingAccount
+    to: BankingProduct
+    type: soft_link
+    via: productCategory
+    note: No product->account foreign key exists in CDR; only productCategory is shared.

@@ -1,0 +1,26 @@
+generated: '2026-07-20'
+method: searched
+description: >-
+  Results of probing the /.well-known/ discovery surface for ING Australia's CDR
+  hosts (the registered CDR publicBaseUri host id.ob.ing.com.au and the consumer
+  site www.ing.com.au). ING is a Consumer Data Right (CDR) accredited data holder,
+  so its OpenID Provider metadata is published per the CDS / FAPI profile. Status
+  is the HTTP code observed at fetch time; the OIDC discovery document returned a
+  real JSON payload and was saved verbatim.
+hosts:
+  - host: https://id.ob.ing.com.au
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        type: application/json
+        file: ing-australia-openid-configuration.json
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /cds-au/v1/.well-known/openid-configuration
+        status: 404
+  - host: https://www.ing.com.au
+    documents:
+      - path: /.well-known/security.txt
+        status: 404

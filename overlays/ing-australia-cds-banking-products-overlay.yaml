@@ -1,0 +1,27 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for ING Australia CDS Banking API
+  version: 1.0.0
+extends: openapi/ing-australia-cds-banking-products-openapi.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provider: ING Australia
+      x-apievangelist-cdr-role: data-holder
+      x-apievangelist-public-endpoints:
+        - listBankingProducts
+        - getBankingProductDetail
+      x-apievangelist-auth-profile: FAPI 1.0 Advanced (AU CDR)
+      x-apievangelist-openid-configuration: https://id.ob.ing.com.au/.well-known/openid-configuration
+      x-apievangelist-artifacts:
+        authentication: authentication/ing-australia-authentication.yml
+        scopes: scopes/ing-australia-scopes.yml
+        errors: errors/ing-australia-problem-types.yml
+        conventions: conventions/ing-australia-conventions.yml
+        lifecycle: lifecycle/ing-australia-lifecycle.yml
+        conformance: conformance/ing-australia-conformance.yml
+        data_model: data-model/ing-australia-data-model.yml
+  - target: $.servers
+    update:
+      - description: ING CDR public base URI (registered publicBaseUri per the CDR Register)
+        url: https://id.ob.ing.com.au/cds-au/v1

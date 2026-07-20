@@ -1,0 +1,55 @@
+generated: '2026-07-20'
+method: searched
+source: https://id.ob.ing.com.au/.well-known/openid-configuration
+docs: https://consumerdatastandardsaustralia.github.io/standards/#authorisation-scopes
+description: >-
+  OAuth2 / OIDC scopes advertised in ING Australia's live CDR OpenID Provider
+  metadata (scopes_supported). These are the standard Consumer Data Standards
+  (CDS) banking and common authorisation scopes granted to Accredited Data
+  Recipients through the CDR consent flow. The public PRD endpoints require no
+  scope; every other endpoint requires the mapped bank:* scope (see x-scopes in
+  the OpenAPI). Descriptions and endpoint mappings are from the CDS authorisation
+  scopes reference.
+schemes:
+  - name: CDR-OAuth2
+    source: well-known/ing-australia-openid-configuration.json
+    flows:
+      - flow: authorizationCode
+        authorizationUrl: https://id.ob.ing.com.au/authorize
+        tokenUrl: https://secure.ob.ing.com.au/token
+scopes:
+  - scope: openid
+    description: OpenID Connect authentication; issue an ID token for the customer.
+    flows: [authorizationCode]
+  - scope: profile
+    description: Basic OIDC profile claims (name, given_name, family_name).
+    flows: [authorizationCode]
+  - scope: bank:accounts.basic:read
+    description: Read basic account information and balances (list/detail without full account numbers).
+    operations: [listBankingAccounts, listBankingBalancesBulk, listBankingBalancesSpecificAccounts, getBankingBalance]
+    flows: [authorizationCode]
+  - scope: bank:accounts.detail:read
+    description: Read detailed account information including account numbers and features.
+    operations: [getBankingAccountDetail]
+    flows: [authorizationCode]
+  - scope: bank:transactions:read
+    description: Read account transactions and transaction detail.
+    operations: [listBankingTransactions, getBankingTransactionDetail]
+    flows: [authorizationCode]
+  - scope: bank:payees:read
+    description: Read the customer's saved/registered payees.
+    operations: [listBankingPayees, getBankingPayeeDetail]
+    flows: [authorizationCode]
+  - scope: bank:regular_payments:read
+    description: Read direct debits, scheduled payments and instalment plans.
+    operations: [listDirectDebits, listDirectDebitsBulk, listDirectDebitsSpecificAccounts, listScheduledPayments, listScheduledPaymentsBulk, listScheduledPaymentsSpecificAccounts, listInstalmentPlans, listInstalmentPlansBulk]
+    flows: [authorizationCode]
+  - scope: common:customer.basic:read
+    description: Read basic customer information (name, occupation / organisation basics).
+    flows: [authorizationCode]
+  - scope: common:customer.detail:read
+    description: Read detailed customer information including contact details.
+    flows: [authorizationCode]
+  - scope: cdr:registration
+    description: Dynamic client registration management for the Accredited Data Recipient's software product.
+    flows: [clientCredentials]

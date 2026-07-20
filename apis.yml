@@ -53,6 +53,36 @@ apis:
     Responses are versioned via the x-v request/response header. The base URI is ING
     Bank (Australia) Ltd's registered CDR publicBaseUri per the CDR Register.
 common:
+- type: AgenticAccess
+  url: agentic-access/ing-australia-agentic-access.yml
+- type: DomainSecurity
+  url: security/ing-australia-domain-security.yml
+- type: Authentication
+  url: authentication/ing-australia-authentication.yml
+- type: OAuthScopes
+  url: scopes/ing-australia-scopes.yml
+- type: WellKnown
+  url: well-known/ing-australia-well-known.yml
+- type: Conformance
+  url: conformance/ing-australia-conformance.yml
+- type: ErrorCatalog
+  url: errors/ing-australia-problem-types.yml
+- type: Conventions
+  url: conventions/ing-australia-conventions.yml
+- type: Lifecycle
+  url: lifecycle/ing-australia-lifecycle.yml
+- type: Deprecation
+  url: https://consumerdatastandardsaustralia.github.io/standards/#future-dated-obligations
+- type: DataModel
+  url: data-model/ing-australia-data-model.yml
+- type: MCPServer
+  url: mcp/ing-australia-mcp.yml
+- type: LLMsTxt
+  url: llms/ing-australia-llms.txt
+- type: Overlay
+  url: overlays/ing-australia-cds-banking-products-overlay.yaml
+- type: AgentSkill
+  url: skills/_index.yml
 - type: Website
   url: https://www.ing.com.au/
 - type: Documentation

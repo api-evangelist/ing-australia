@@ -1,0 +1,45 @@
+generated: '2026-07-20'
+method: searched
+source: >-
+  https://id.ob.ing.com.au/.well-known/openid-configuration +
+  openapi/ing-australia-cds-banking-products-openapi.yml +
+  https://consumerdatastandardsaustralia.github.io/standards/
+description: >-
+  Cross-cutting standards ING Australia's CDR Banking surface conforms to. Evidence
+  is drawn from the live OpenID Provider metadata and the Consumer Data Standards
+  (CDS) the API implements. ING is an accredited CDR data holder; the API is the
+  reference CDS Banking spec (Data Standards Body, v1.36.0).
+standards:
+  - id: consumer-data-standards-au
+    conforms: true
+    evidence: API implements the CDS Banking APIs (path /cds-au/v1, DSB spec v1.36.0), x-v/x-min-v version negotiation, CDR ID permanence.
+  - id: oauth2
+    conforms: true
+    evidence: openid-configuration advertises authorization_code + client_credentials grants, token/authorize endpoints.
+  - id: oidc
+    conforms: true
+    evidence: openid-configuration issuer + id_token (PS256), userinfo, jwks_uri, openid scope.
+  - id: fapi-1.0-advanced
+    conforms: true
+    evidence: private_key_jwt auth, PAR required, PKCE S256, PS256 request objects, certificate-bound tokens, acr urn:cds.au:cdr:2/3.
+  - id: rfc9126-par
+    conforms: true
+    evidence: pushed_authorization_request_endpoint present with require_pushed_authorization_requests=true.
+  - id: rfc8705-mtls-bound-tokens
+    conforms: true
+    evidence: tls_client_certificate_bound_access_tokens=true; MTLS data-holder server in OpenAPI.
+  - id: rfc7636-pkce
+    conforms: true
+    evidence: code_challenge_methods_supported includes S256.
+  - id: rfc4122-uuid-correlation
+    conforms: true
+    evidence: x-fapi-interaction-id request/response correlation header (RFC 4122 UUID).
+  - id: cdr-error-codes
+    conforms: true
+    evidence: errors use CDR standardised error code URNs (ErrorV2 code/title/detail/meta), see errors/ing-australia-problem-types.yml.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: CDR uses its own ErrorV2 envelope (urn:au-cds:error:*), not application/problem+json.
+  - id: cursor-pagination
+    conforms: false
+    evidence: uses page/page-size offset pagination with links/meta, not cursor-based.

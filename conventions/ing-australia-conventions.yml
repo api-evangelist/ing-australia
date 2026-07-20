@@ -1,0 +1,61 @@
+generated: '2026-07-20'
+method: derived
+source: openapi/ing-australia-cds-banking-products-openapi.yml
+docs: https://consumerdatastandardsaustralia.github.io/standards/#http-headers
+description: >-
+  Cross-cutting request/response conventions for ING Australia's CDS Banking API,
+  derived from the OpenAPI and the Consumer Data Standards. These are Data Standards
+  Body conventions common to every CDR data holder.
+authentication:
+  style: >-
+    Public PRD endpoints unauthenticated; all other endpoints use FAPI 1.0 Advanced
+    OAuth2 (authorization_code) via the CDR ecosystem. See
+    authentication/ing-australia-authentication.yml and scopes/ing-australia-scopes.yml.
+idempotency:
+  supported: false
+  note: >-
+    The captured surface is entirely read-only (GET, plus POST endpoints that are
+    read-by-body filters returning data, not resource creation). No idempotency-key
+    contract is defined by the standards for these endpoints.
+versioning:
+  style: per-endpoint header negotiation
+  request_headers: [x-v, x-min-v]
+  response_headers: [x-v]
+  note: >-
+    Clients request an endpoint version with x-v (and optional minimum x-min-v);
+    the holder responds with the highest supported version in x-v, or 406
+    Unsupported Version. Each operation carries its current x-version in the spec.
+  unsupported_response: 406 urn:au-cds:error:cds-all:Header/UnsupportedVersion
+pagination:
+  style: offset
+  params: [page, page-size]
+  defaults: {page: 1, page-size: 25}
+  response_fields: [links.first, links.prev, links.next, links.last, meta.totalRecords, meta.totalPages]
+  note: Standard pagination via LinksPaginated / MetaPaginated objects.
+request_tracing:
+  header: x-fapi-interaction-id
+  format: RFC 4122 UUID
+  note: >-
+    If supplied by the client the holder MUST echo it in the response; otherwise the
+    holder generates one. Used as the correlation id for a request.
+fapi_headers:
+  request: [x-fapi-auth-date, x-fapi-customer-ip-address, x-cds-client-headers]
+  note: >-
+    Conditional headers indicating customer-present vs unattended context; not sent
+    on unauthenticated PRD calls.
+error_envelope:
+  shape: ResponseErrorListV2 (errors[] of code/title/detail/meta)
+  format: cdr-error-codes
+  ref: errors/ing-australia-problem-types.yml
+rate_limit_signaling:
+  documented: false
+  note: >-
+    Rate limits are governed by the CDR Non-Functional Requirements (traffic
+    thresholds per data recipient) rather than per-response rate-limit headers in
+    this spec.
+id_permanence:
+  note: >-
+    accountId, transactionId, payeeId, scheduledPaymentId and instalmentPlanId are
+    generated per CDR ID Permanence rules (stable per customer+recipient). productId
+    is data-holder specific and need not be permanent.
+lifecycle_ref: lifecycle/ing-australia-lifecycle.yml

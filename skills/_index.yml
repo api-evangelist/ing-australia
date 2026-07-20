@@ -1,0 +1,14 @@
+generated: '2026-07-20'
+method: generated
+source: openapi/ing-australia-cds-banking-products-openapi.yml
+skills:
+  - file: ing-australia-list-products.md
+    name: List ING Australia banking products (public CDR PRD)
+    api: openapi/ing-australia-cds-banking-products-openapi.yml
+    operations: [listBankingProducts, getBankingProductDetail]
+    auth: none
+  - file: ing-australia-consumer-data-sharing.md
+    name: Read ING Australia account data via CDR consumer data sharing
+    api: openapi/ing-australia-cds-banking-products-openapi.yml
+    operations: [listBankingAccounts, getBankingAccountDetail, getBankingBalance, listBankingTransactions, getBankingTransactionDetail]
+    auth: cdr-oauth2

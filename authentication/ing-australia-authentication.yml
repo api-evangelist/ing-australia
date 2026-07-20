@@ -1,0 +1,60 @@
+generated: '2026-07-20'
+method: searched
+source: https://id.ob.ing.com.au/.well-known/openid-configuration
+docs: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+description: >-
+  Authentication profile for ING Australia's CDR (Open Banking) surface. The public
+  Product Reference Data (PRD) endpoints (GET /banking/products and
+  /banking/products/{productId}) are UNAUTHENTICATED. All other CDS Banking
+  endpoints (accounts, balances, transactions, direct debits, scheduled payments,
+  payees) require an authenticated CDR consumer-data-sharing session obtained
+  through the CDR ecosystem: an Accredited Data Recipient authenticates the customer
+  and calls the data holder under the FAPI 1.0 Advanced (Australia CDR) security
+  profile. Derived from ING's live OpenID Provider metadata; the OpenAPI itself
+  declares no components.securitySchemes (it uses x-scopes extensions), so the model
+  below is sourced from the published discovery document and the Consumer Data
+  Standards security profile.
+summary:
+  types: [oauth2, openIdConnect, mutualTLS]
+  profile: FAPI 1.0 Advanced (AU CDR)
+  public_endpoints: [listBankingProducts, getBankingProductDetail]
+  oauth2_flows: [authorizationCode, clientCredentials]
+  token_endpoint_auth: [private_key_jwt]
+  par_required: true
+  mtls_bound_tokens: true
+  pkce: S256
+schemes:
+  - name: CDR-OIDC
+    type: openIdConnect
+    openIdConnectUrl: https://id.ob.ing.com.au/.well-known/openid-configuration
+    issuer: https://id.ob.ing.com.au
+    sources: [well-known/ing-australia-openid-configuration.json]
+  - name: CDR-OAuth2
+    type: oauth2
+    flows:
+      - flow: authorizationCode
+        authorizationUrl: https://id.ob.ing.com.au/authorize
+        tokenUrl: https://secure.ob.ing.com.au/token
+        pushed_authorization_request_endpoint: https://secure.ob.ing.com.au/par
+        require_pushed_authorization_requests: true
+        response_types: [code id_token, code]
+        response_modes: [query, form_post, fragment, jwt]
+        code_challenge_methods: [S256]
+      - flow: clientCredentials
+        tokenUrl: https://secure.ob.ing.com.au/token
+    token_endpoint_auth_methods_supported: [private_key_jwt]
+    id_token_signing_alg_values_supported: [PS256]
+    request_object_signing_alg_values_supported: [PS256]
+    acr_values_supported: [urn:cds.au:cdr:2, urn:cds.au:cdr:3]
+    tls_client_certificate_bound_access_tokens: true
+    registration_endpoint: https://secure.ob.ing.com.au/register
+    cdr_arrangement_revocation_endpoint: true
+    sources: [well-known/ing-australia-openid-configuration.json]
+  - name: CDR-mTLS
+    type: mutualTLS
+    description: >-
+      Data-holder resource and token endpoints require mutual TLS with certificates
+      issued under the CDR Register PKI; access tokens are certificate-bound
+      (RFC 8705). The OpenAPI's MTLS server (mtls.dh.example.com) is the CDS
+      placeholder for this host.
+    sources: [openapi/ing-australia-cds-banking-products-openapi.yml]
