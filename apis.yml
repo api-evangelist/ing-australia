@@ -25,7 +25,7 @@ tags:
 - Product Reference Data
 - ADI
 created: '2026-07-20'
-modified: '2026-07-20'
+modified: '2026-07-21'
 specificationVersion: '0.19'
 apis:
 - aid: ing-australia:ing-australia-cdr-product-reference-data-api
@@ -37,8 +37,8 @@ apis:
   - Banking
   - Consumer Data Standards
   image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://www.ing.com.au/
-  baseURL: https://id.ob.ing.com.au/cds-au/v1
+  humanURL: https://www.ing.com.au/open-banking.html
+  baseURL: https://id.ob.ing.com.au/cds-au/v1/banking/products
   properties:
   - url: https://www.ing.com.au/pdf/CDR-policy.pdf
     type: Documentation
@@ -51,7 +51,118 @@ apis:
     of ING's publicly offered banking products) and GET /banking/products/{productId}
     (full product detail) under the Consumer Data Standards (CDS) path /cds-au/v1.
     Responses are versioned via the x-v request/response header. The base URI is ING
-    Bank (Australia) Ltd's registered CDR publicBaseUri per the CDR Register.
+    Bank (Australia) Ltd's registered CDR publicBaseUri per the CDR Register and is
+    verified live (GET /banking/products returns HTTP 200 with header x-v:4 as of
+    2026-07-21). ING documents these exact endpoints on its public open-banking page.
+- aid: ing-australia:ing-australia-cdr-accounts-balances-api
+  name: ING Australia CDR Accounts & Balances API
+  tags:
+  - CDR
+  - Open Banking
+  - Banking
+  - Accounts
+  - Balances
+  - Consumer Data Standards
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.ing.com.au/open-banking.html
+  baseURL: https://id.ob.ing.com.au/cds-au/v1/banking/accounts
+  properties:
+  - url: https://www.ing.com.au/pdf/CDR-policy.pdf
+    type: Documentation
+  - url: https://consumerdatastandardsaustralia.github.io/standards/#banking-apis
+    type: APIReference
+  - url: openapi/ing-australia-cds-banking-products-openapi.yml
+    type: OpenAPI
+  description: Consumer-authorized (not public) CDR Banking API surface for account
+    data. Covers Get Accounts (GET /banking/accounts), Get Bulk Balances (GET/POST
+    /banking/accounts/balances), Get Account Balance (GET /banking/accounts/{accountId}/balance),
+    and Get Account Detail (GET /banking/accounts/{accountId}) under the Consumer Data
+    Standards path /cds-au/v1. These endpoints require an active CDR consent obtained
+    through an Accredited Data Recipient using the FAPI OAuth2/OIDC authorization flow;
+    they are not callable by the public. This is the shared DSB Consumer Data Standards
+    Banking API (v1.36.0) that every accredited data holder ADI, including ING Bank
+    (Australia) Ltd, is legally required to implement, not a bank-proprietary API.
+- aid: ing-australia:ing-australia-cdr-transactions-api
+  name: ING Australia CDR Transactions API
+  tags:
+  - CDR
+  - Open Banking
+  - Banking
+  - Transactions
+  - Consumer Data Standards
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.ing.com.au/open-banking.html
+  baseURL: https://id.ob.ing.com.au/cds-au/v1/banking/accounts
+  properties:
+  - url: https://www.ing.com.au/pdf/CDR-policy.pdf
+    type: Documentation
+  - url: https://consumerdatastandardsaustralia.github.io/standards/#banking-apis
+    type: APIReference
+  - url: openapi/ing-australia-cds-banking-products-openapi.yml
+    type: OpenAPI
+  description: Consumer-authorized (not public) CDR Banking API surface for transaction
+    data. Covers Get Transactions For Account (GET /banking/accounts/{accountId}/transactions)
+    and Get Transaction Detail (GET /banking/accounts/{accountId}/transactions/{transactionId})
+    under the Consumer Data Standards path /cds-au/v1, including standard query filters
+    for date range, amount, and text search. These endpoints require an active CDR
+    consent obtained via an Accredited Data Recipient using the FAPI OAuth2/OIDC flow
+    and are not callable by the public. This is the shared DSB Consumer Data Standards
+    Banking API (v1.36.0) that ING Bank (Australia) Ltd implements as an accredited
+    data holder, not a bank-proprietary API.
+- aid: ing-australia:ing-australia-cdr-direct-debits-scheduled-payments-api
+  name: ING Australia CDR Direct Debits & Scheduled Payments API
+  tags:
+  - CDR
+  - Open Banking
+  - Banking
+  - Direct Debits
+  - Scheduled Payments
+  - Consumer Data Standards
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.ing.com.au/open-banking.html
+  baseURL: https://id.ob.ing.com.au/cds-au/v1/banking
+  properties:
+  - url: https://www.ing.com.au/pdf/CDR-policy.pdf
+    type: Documentation
+  - url: https://consumerdatastandardsaustralia.github.io/standards/#banking-apis
+    type: APIReference
+  - url: openapi/ing-australia-cds-banking-products-openapi.yml
+    type: OpenAPI
+  description: Consumer-authorized (not public) CDR Banking API surface for recurring
+    money movement. Covers Get Direct Debits For Account (GET /banking/accounts/{accountId}/direct-debits),
+    Get Bulk Direct Debits (GET/POST /banking/accounts/direct-debits), Get Scheduled
+    Payments For Account (GET /banking/accounts/{accountId}/payments/scheduled), and
+    Get Bulk Scheduled Payments (GET/POST /banking/payments/scheduled) under the
+    Consumer Data Standards path /cds-au/v1. These endpoints require an active CDR
+    consent obtained via an Accredited Data Recipient using the FAPI OAuth2/OIDC flow
+    and are not callable by the public. This is the shared DSB Consumer Data Standards
+    Banking API (v1.36.0) that ING Bank (Australia) Ltd implements as a data holder.
+- aid: ing-australia:ing-australia-cdr-payees-api
+  name: ING Australia CDR Payees API
+  tags:
+  - CDR
+  - Open Banking
+  - Banking
+  - Payees
+  - Consumer Data Standards
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.ing.com.au/open-banking.html
+  baseURL: https://id.ob.ing.com.au/cds-au/v1/banking/payees
+  properties:
+  - url: https://www.ing.com.au/pdf/CDR-policy.pdf
+    type: Documentation
+  - url: https://consumerdatastandardsaustralia.github.io/standards/#banking-apis
+    type: APIReference
+  - url: openapi/ing-australia-cds-banking-products-openapi.yml
+    type: OpenAPI
+  description: Consumer-authorized (not public) CDR Banking API surface for saved
+    payees. Covers Get Payees (GET /banking/payees) and Get Payee Detail (GET
+    /banking/payees/{payeeId}) under the Consumer Data Standards path /cds-au/v1.
+    These endpoints require an active CDR consent obtained via an Accredited Data
+    Recipient using the FAPI OAuth2/OIDC flow and are not callable by the public.
+    This is the shared DSB Consumer Data Standards Banking API (v1.36.0) that ING
+    Bank (Australia) Ltd implements as an accredited data holder, not a bank-proprietary
+    API.
 common:
 - type: AgenticAccess
   url: agentic-access/ing-australia-agentic-access.yml
@@ -85,10 +196,14 @@ common:
   url: skills/_index.yml
 - type: Website
   url: https://www.ing.com.au/
+- type: GettingStarted
+  url: https://www.ing.com.au/open-banking.html
 - type: Documentation
   url: https://www.ing.com.au/pdf/CDR-policy.pdf
 - type: APIReference
   url: https://consumerdatastandardsaustralia.github.io/standards/
+- type: Support
+  url: mailto:cdrenquiry@ing.com.au
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
