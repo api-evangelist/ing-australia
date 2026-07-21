@@ -204,6 +204,10 @@ common:
   url: https://consumerdatastandardsaustralia.github.io/standards/
 - type: Support
   url: mailto:cdrenquiry@ing.com.au
+- type: PrivacyPolicy
+  url: https://www.ing.com.au/privacy.html
+- type: TermsOfService
+  url: https://www.ing.com.au/legal.html
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
