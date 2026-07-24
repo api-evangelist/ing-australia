@@ -1,0 +1,1393 @@
+openapi: 3.0.3
+info:
+  title: CDR Banking Banking Account Balances Banking Accounts API
+  version: 1.36.0
+  description: Specifications for resource endpoints applicable to data holders in the Banking sector.
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: Data Standards Body
+    email: contact@dsb.gov.au
+    url: https://dsb.gov.au/
+servers:
+- description: MTLS
+  url: https://mtls.dh.example.com/cds-au/v1
+tags:
+- name: Banking Accounts
+  x-shortName: Accounts
+  description: Banking Account endpoints
+paths:
+  /banking/accounts:
+    get:
+      tags:
+      - Banking Accounts
+      summary: Get Accounts
+      description: 'Obtain a list of accounts.
+
+
+        Obsolete versions: [v1](includes/obsolete/get-accounts-v1.html), [v2](includes/obsolete/get-accounts-v2.html).'
+      operationId: listBankingAccounts
+      parameters:
+      - $ref: '#/components/parameters/QueryBankingProductCategory'
+      - $ref: '#/components/parameters/QueryBankingAccountOpenStatus'
+      - $ref: '#/components/parameters/QueryBankingAccountIsOwned'
+      - $ref: '#/components/parameters/QueryPage'
+      - $ref: '#/components/parameters/QueryPageSize'
+      - $ref: '#/components/parameters/HeaderXV'
+      - $ref: '#/components/parameters/HeaderXMinV'
+      - $ref: '#/components/parameters/HeaderXFAPIInteractionId'
+      - $ref: '#/components/parameters/HeaderXFAPIAuthDate'
+      - $ref: '#/components/parameters/HeaderXFAPICustomerIPAddress'
+      - $ref: '#/components/parameters/HeaderXCDSClientHeaders'
+      responses:
+        '200':
+          $ref: '#/components/responses/ListBankingAccounts200'
+        '400':
+          $ref: '#/components/responses/ListBankingAccounts400'
+        '406':
+          $ref: '#/components/responses/ListBankingAccounts406'
+        '422':
+          $ref: '#/components/responses/ListBankingAccounts422'
+      x-scopes:
+      - bank:accounts.basic:read
+      x-version: '3'
+  /banking/accounts/{accountId}:
+    get:
+      tags:
+      - Banking Accounts
+      summary: Get Account Detail
+      description: 'Obtain detailed information on a single account.
+
+
+        Obsolete versions: [v1](includes/obsolete/get-account-detail-v1.html), [v2](includes/obsolete/get-account-detail-v2.html), [v3](includes/obsolete/get-account-detail-v3.html), [v4](includes/obsolete/get-account-detail-v4.html).'
+      operationId: getBankingAccountDetail
+      parameters:
+      - $ref: '#/components/parameters/PathAccountId'
+      - $ref: '#/components/parameters/HeaderXV'
+      - $ref: '#/components/parameters/HeaderXMinV'
+      - $ref: '#/components/parameters/HeaderXFAPIInteractionId'
+      - $ref: '#/components/parameters/HeaderXFAPIAuthDate'
+      - $ref: '#/components/parameters/HeaderXFAPICustomerIPAddress'
+      - $ref: '#/components/parameters/HeaderXCDSClientHeaders'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetBankingAccountDetail200'
+        '400':
+          $ref: '#/components/responses/GetBankingAccountDetail400'
+        '404':
+          $ref: '#/components/responses/GetBankingAccountDetail404'
+        '406':
+          $ref: '#/components/responses/GetBankingAccountDetail406'
+      x-scopes:
+      - bank:accounts.detail:read
+      x-version: '5'
+components:
+  responses:
+    GetBankingAccountDetail400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingAccounts406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingAccounts422:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingAccounts400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    GetBankingAccountDetail406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingAccounts200:
+      description: Successful response
+      headers:
+        x-v:
+          $ref: '#/components/headers/XV'
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBankingAccountListV3'
+    GetBankingAccountDetail200:
+      description: Successful response
+      headers:
+        x-v:
+          $ref: '#/components/headers/XV'
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBankingAccountByIdV5'
+    GetBankingAccountDetail404:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+  schemas:
+    BankingFeeDiscountAmount:
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          type: string
+          description: The specific amount discounted from the fee each time it is incurred.
+          x-cds-type: AmountString
+    Meta:
+      type: object
+    BankingFeeAmount:
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          type: string
+          description: The specific amount charged for the fee each time it is incurred.
+          x-cds-type: AmountString
+    BankingAccountId:
+      type: string
+      description: A unique identifier for a Banking account, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
+    CommonPhysicalAddress:
+      required:
+      - addressUType
+      type: object
+      properties:
+        addressUType:
+          type: string
+          description: The type of address object present.
+          enum:
+          - paf
+          - simple
+        simple:
+          $ref: '#/components/schemas/CommonSimpleAddress'
+        paf:
+          $ref: '#/components/schemas/CommonPAFAddress'
+      x-conditional:
+      - simple
+      - paf
+    ErrorV2:
+      type: object
+      required:
+      - code
+      - title
+      - detail
+      x-conditional:
+      - meta
+      properties:
+        code:
+          type: string
+          description: The code of the error encountered. Where the error is specific to the respondent, an application-specific error code, expressed as a string value. If the error is application-specific, the URN code that the specific error extends must be provided in the _meta_ object. Otherwise, the value is the error code URN.
+        title:
+          type: string
+          description: A short, human-readable summary of the problem that **MUST NOT** change from occurrence to occurrence of the problem represented by the error code.
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+        meta:
+          type: object
+          x-conditional:
+          - urn
+          description: Additional data for customised error codes.
+          properties:
+            urn:
+              type: string
+              description: The CDR error code URN which the application-specific error code extends. Mandatory if the error _code_ is an application-specific error rather than a standardised error code.
+    LinksPaginated:
+      required:
+      - self
+      type: object
+      properties:
+        self:
+          type: string
+          description: Fully qualified link that generated the current response document.
+          x-cds-type: URIString
+        first:
+          type: string
+          description: URI to the first page of this set. Mandatory if this response is not the first page.
+          x-cds-type: URIString
+        prev:
+          type: string
+          description: URI to the previous page of this set. Mandatory if this response is not the first page.
+          x-cds-type: URIString
+        next:
+          type: string
+          description: URI to the next page of this set. Mandatory if this response is not the last page.
+          x-cds-type: URIString
+        last:
+          type: string
+          description: URI to the last page of this set. Mandatory if this response is not the last page.
+          x-cds-type: URIString
+      x-conditional:
+      - prev
+      - next
+      - first
+      - last
+    BankingProductDiscountV2:
+      description: Note that the currency of the fee discount is expected to be the same as the currency of the fee itself.
+      required:
+      - description
+      - discountType
+      - discountMethodUType
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the discount.
+        discountType:
+          type: string
+          description: The type of discount. For further details, refer to [Product Discount Types](#tocSproductdiscounttypedoc).
+          enum:
+          - BALANCE
+          - DEPOSITS
+          - ELIGIBILITY_ONLY
+          - FEE_CAP
+          - PAYMENTS
+        discountMethodUType:
+          type: string
+          description: Reference to the applicable fee discount method structure.
+          enum:
+          - fixedAmount
+          - rateBased
+        fixedAmount:
+          description: Mandatory if the _discountMethodUType_ value is `fixedAmount`. Where the discount is a specific amount.
+          allOf:
+          - $ref: '#/components/schemas/BankingFeeDiscountAmount'
+        rateBased:
+          description: Mandatory if the _discountMethodUType_ value is `rateBased`. Where the discount is based on a type of rate. Unless noted in _additionalInfo_, assumes the application and calculation frequency are the same as the corresponding fee.
+          allOf:
+          - $ref: '#/components/schemas/BankingFeeDiscountRate'
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the [_discountType_](#tocSproductdiscounttypedoc) specified. Whether mandatory or not is dependent on the value of [_discountType_](#tocSproductdiscounttypedoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the discount.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this discount.
+          x-cds-type: URIString
+        eligibility:
+          type: array
+          description: Eligibility constraints that apply to this discount. Mandatory if the [_discountType_](#tocSproductdiscounttypedoc) value is `ELIGIBILITY_ONLY`.
+          items:
+            $ref: '#/components/schemas/BankingProductDiscountEligibility'
+      x-conditional:
+      - fixedAmount
+      - rateBased
+      - additionalValue
+      - eligibility
+    ResponseBankingAccountListV3:
+      required:
+      - data
+      - links
+      - meta
+      type: object
+      properties:
+        data:
+          required:
+          - accounts
+          type: object
+          properties:
+            accounts:
+              type: array
+              description: The list of accounts returned. If the filter results in an empty set then this array may have no records.
+              items:
+                $ref: '#/components/schemas/BankingAccountV3'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+    BankingCreditCardAccount:
+      required:
+      - minPaymentAmount
+      - paymentDueAmount
+      - paymentDueDate
+      type: object
+      properties:
+        minPaymentAmount:
+          type: string
+          description: The minimum payment amount due for the next card payment.
+          x-cds-type: AmountString
+        paymentDueAmount:
+          type: string
+          description: The amount due for the next card payment.
+          x-cds-type: AmountString
+        paymentCurrency:
+          type: string
+          description: If absent assumes `AUD`.
+          default: AUD
+          x-cds-type: CurrencyString
+        paymentDueDate:
+          type: string
+          description: Date that the next payment for the card is due.
+          x-cds-type: DateString
+    CommonSimpleAddress:
+      description: Mandatory if the _addressUType_ value is `simple`.
+      required:
+      - addressLine1
+      - city
+      - state
+      type: object
+      properties:
+        mailingName:
+          type: string
+          description: Name of the individual or business formatted for inclusion in an address used for physical mail.
+        addressLine1:
+          type: string
+          description: First line of the standard address object.
+        addressLine2:
+          type: string
+          description: Second line of the standard address object.
+        addressLine3:
+          type: string
+          description: Third line of the standard address object.
+        postcode:
+          type: string
+          description: Mandatory for Australian addresses.
+        city:
+          type: string
+          description: Name of the city or locality.
+        state:
+          type: string
+          description: Free text if the country is not Australia. If country is Australia then must be one of the values defined by the [State Type Abbreviation](https://auspost.com.au/content/dam/auspost_corp/media/documents/australia-post-data-guide.pdf) in the PAF file format. `NSW`, `QLD`, `VIC`, `NT`, `WA`, `SA`, `TAS`, `ACT`, `AAT`.
+        country:
+          type: string
+          description: A valid [ISO 3166 Alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code. Australia (`AUS`) is assumed if country is not present.
+          default: AUS
+          x-cds-type: ExternalRef
+      x-conditional:
+      - postcode
+    BankingProductLendingRateV3:
+      required:
+      - lendingRateType
+      - rate
+      - applicationType
+      - repaymentType
+      - loanPurpose
+      type: object
+      properties:
+        lendingRateType:
+          type: string
+          description: The type of rate (`FIXED`, `VARIABLE`, etc.) For further details, refer to [Product Lending Rate Types](#tocSproductlendingratetypedoc).
+          enum:
+          - BALANCE_TRANSFER
+          - BUNDLE_DISCOUNT_FIXED
+          - BUNDLE_DISCOUNT_VARIABLE
+          - CASH_ADVANCE
+          - DISCOUNT
+          - FIXED
+          - FLOATING
+          - INTRODUCTORY
+          - MARKET_LINKED
+          - PENALTY
+          - PURCHASE
+          - VARIABLE
+          example: FIXED
+        rate:
+          type: string
+          description: The rate to be applied.
+          x-cds-type: RateString
+        comparisonRate:
+          type: string
+          description: A comparison rate equivalent for this rate.
+          x-cds-type: RateString
+        calculationFrequency:
+          type: string
+          description: The period after which the rate is applied to the balance to calculate the amount due for the period. Calculation of the amount is often daily (as balances may change) but accumulated until the total amount is 'applied' to the account (see _applicationFrequency_). Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax).
+          x-cds-type: ExternalRef
+        applicationType:
+          type: string
+          description: The type of approach used to apply the rate to the account.
+          enum:
+          - MATURITY
+          - PERIODIC
+          - UPFRONT
+          example: PERIODIC
+        applicationFrequency:
+          type: string
+          description: The period after which the calculated amount(s) (see _calculationFrequency_) are 'applied' (i.e. debited or credited) to the account. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax). Mandatory if the _applicationType_ value is `PERIODIC`.
+          x-cds-type: ExternalRef
+        interestPaymentDue:
+          type: string
+          description: When loan payments are due to be paid within each period. The investment benefit of earlier payments affect the rate that can be offered.
+          enum:
+          - IN_ADVANCE
+          - IN_ARREARS
+        repaymentType:
+          type: string
+          description: Option in place for repayments.
+          enum:
+          - INTEREST_ONLY
+          - OTHER
+          - PRINCIPAL_AND_INTEREST
+          - UNCONSTRAINED
+        loanPurpose:
+          type: string
+          description: The reason for taking out the loan.
+          enum:
+          - INVESTMENT
+          - OTHER
+          - OWNER_OCCUPIED
+          - UNCONSTRAINED
+        tiers:
+          type: array
+          description: Qualifying criteria or conditions relevant to the associated rate.
+          items:
+            $ref: '#/components/schemas/BankingProductRateTierV4'
+        applicabilityConditions:
+          type: array
+          description: Applicability conditions for the rate.
+          items:
+            $ref: '#/components/schemas/BankingProductRateConditionV2'
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the [_lendingRateType_](#tocSproductlendingratetypedoc) specified. Whether mandatory or not is dependent on the value of [_lendingRateType_](#tocSproductlendingratetypedoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the rate.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this rate.
+          x-cds-type: URIString
+      x-conditional:
+      - additionalValue
+      - applicationFrequency
+    BankingProductDiscountEligibility:
+      required:
+      - discountEligibilityType
+      type: object
+      properties:
+        discountEligibilityType:
+          type: string
+          description: The type of the specific eligibility constraint for a discount. For further details, refer to [Product Discount Eligibility Types](#tocSproductdiscounteligibilitydoc).
+          enum:
+          - BUSINESS
+          - EMPLOYMENT_STATUS
+          - INTRODUCTORY
+          - MAX_AGE
+          - MIN_AGE
+          - MIN_INCOME
+          - MIN_TURNOVER
+          - NATURAL_PERSON
+          - OTHER
+          - PENSION_RECIPIENT
+          - RESIDENCY_STATUS
+          - STAFF
+          - STUDENT
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the [_discountEligibilityType_](#tocSproductdiscounteligibilitydoc) specified. Whether mandatory or not is dependent on the value of [_discountEligibilityType_](#tocSproductdiscounteligibilitydoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on this eligibility constraint. Mandatory if the [_discountEligibilityType_](#tocSproductdiscounteligibilitydoc) value is `OTHER`.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this eligibility constraint.
+          x-cds-type: URIString
+      x-conditional:
+      - additionalInfo
+      - additionalValue
+    BankingProductDepositRateV2:
+      required:
+      - depositRateType
+      - rate
+      - applicationType
+      type: object
+      properties:
+        depositRateType:
+          type: string
+          description: The type of rate (`FIXED`, `VARIABLE`, `BONUS`, etc.) For further details, refer to [Product Deposit Rate Types](#tocSproductdepositratetypedoc).
+          enum:
+          - BONUS
+          - BUNDLE_BONUS
+          - FIXED
+          - FLOATING
+          - INTRODUCTORY
+          - MARKET_LINKED
+          - VARIABLE
+          example: VARIABLE
+        rate:
+          type: string
+          description: The rate to be applied.
+          x-cds-type: RateString
+        calculationFrequency:
+          type: string
+          description: The period after which the rate is applied to the balance to calculate the amount due for the period. Calculation of the amount is often daily (as balances may change) but accumulated until the total amount is 'applied' to the account (see _applicationFrequency_). Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax).
+          x-cds-type: ExternalRef
+        applicationType:
+          type: string
+          description: The type of approach used to apply the rate to the account.
+          enum:
+          - MATURITY
+          - PERIODIC
+          - UPFRONT
+          example: PERIODIC
+        applicationFrequency:
+          type: string
+          description: The period after which the calculated amount(s) (see _calculationFrequency_) are 'applied' (i.e. debited or credited) to the account. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax). Mandatory if the _applicationType_ value is `PERIODIC`.
+          x-cds-type: ExternalRef
+        tiers:
+          type: array
+          description: Qualifying criteria or conditions relevant to the associated rate.
+          items:
+            $ref: '#/components/schemas/BankingProductRateTierV4'
+        applicabilityConditions:
+          type: array
+          description: Applicability conditions for the rate.
+          items:
+            $ref: '#/components/schemas/BankingProductRateConditionV2'
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the [_depositRateType_](#tocSproductdepositratetypedoc) specified. Whether mandatory or not is dependent on the value of [_depositRateType_](#tocSproductdepositratetypedoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the rate.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this rate.
+          x-cds-type: URIString
+      x-conditional:
+      - additionalValue
+      - applicationFrequency
+    BankingFeeDiscountRate:
+      type: object
+      required:
+      - rateType
+      - rate
+      properties:
+        rateType:
+          type: string
+          description: Type of fee rate discount calculation.<ul><li>`BALANCE` A fee rate discount based on a balance</li><li>`FEE` A fee rate discount based on the fee to which the discount is attached</li><li>`INTEREST_ACCRUED` A fee rate discount based on interest accrued</li><li>`TRANSACTION` A fee rate discount based on a transaction.</li></ul>
+          enum:
+          - BALANCE
+          - FEE
+          - INTEREST_ACCRUED
+          - TRANSACTION
+        rate:
+          type: string
+          x-cds-type: RateString
+          description: The fee rate discount calculated according to the _rateType_.
+        amountRange:
+          $ref: '#/components/schemas/BankingFeeDiscountRange'
+    BankingFeeRange:
+      type: object
+      description: A minimum or maximum fee amount where a specific fixed amount is not known until the fee is incurred.
+      properties:
+        feeMinimum:
+          type: string
+          description: The minimum fee that will be charged per occurrence.
+          x-cds-type: AmountString
+        feeMaximum:
+          type: string
+          description: The maximum fee that will be charged per occurrence.
+          x-cds-type: AmountString
+    Links:
+      required:
+      - self
+      type: object
+      properties:
+        self:
+          type: string
+          description: Fully qualified link that generated the current response document.
+          x-cds-type: URIString
+    ResponseErrorListV2:
+      type: object
+      required:
+      - errors
+      properties:
+        errors:
+          description: List of errors.
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorV2'
+    MetaPaginated:
+      required:
+      - totalPages
+      - totalRecords
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          description: The total number of records in the full set. See [pagination](#pagination).
+          x-cds-type: NaturalNumber
+        totalPages:
+          type: integer
+          description: The total number of pages in the full set. See [pagination](#pagination).
+          x-cds-type: NaturalNumber
+    BankingAccountV3:
+      required:
+      - accountId
+      - displayName
+      - accountOwnership
+      - maskedNumber
+      - productCategory
+      - productName
+      type: object
+      properties:
+        accountId:
+          description: Unique identifier for the account.
+          allOf:
+          - $ref: '#/components/schemas/BankingAccountId'
+        creationDate:
+          type: string
+          description: Date that the account was created (if known).
+          x-cds-type: DateString
+        displayName:
+          type: string
+          description: The display name of the account as defined by the bank. This should not incorporate account numbers or PANs. If it does the values should be masked according to the rules of the [MaskedAccountString](#common-field-types) common type.
+        nickname:
+          type: string
+          description: A customer supplied nickname for the account.
+        openStatus:
+          type: string
+          description: Open or closed status for the account. If not present then `OPEN` is assumed.
+          default: OPEN
+          enum:
+          - CLOSED
+          - OPEN
+        isOwned:
+          type: boolean
+          description: Flag indicating that the customer associated with the authorisation is an owner of the account. Does not indicate sole ownership, however. If not present then `true` is assumed.
+          default: true
+        accountOwnership:
+          type: string
+          description: Value indicating the number of customers that have ownership of the account, according to the data holder's definition of account ownership. Does not indicate that all account owners are eligible consumers.
+          enum:
+          - UNKNOWN
+          - ONE_PARTY
+          - TWO_PARTY
+          - MANY_PARTY
+          - OTHER
+        maskedNumber:
+          type: string
+          description: A masked version of the account. Whether BSB/Account Number, Credit Card PAN or another number.
+          x-cds-type: MaskedAccountString
+        productCategory:
+          $ref: '#/components/schemas/BankingProductCategoryV2'
+        productName:
+          type: string
+          description: The unique identifier of the account as defined by the data holder (akin to model number for the account).
+        isInstalmentDetailAvailable:
+          type: boolean
+          default: false
+          description: '`true` if any active or inactive instalment plans are available in the Get Instalment Plans endpoints. `false` if instalment plans are not applicable to the account.'
+    BankingFeeDiscountRange:
+      type: object
+      description: A minimum or maximum fee discount amount where a specific fixed amount is not known until the fee is incurred.
+      properties:
+        discountMinimum:
+          type: string
+          description: The minimum fee discount that will be applied per occurrence.
+          x-cds-type: AmountString
+        discountMaximum:
+          type: string
+          description: The maximum fee discount that will be applied per occurrence.
+          x-cds-type: AmountString
+    BankingLoanAccountV3:
+      required:
+      - repaymentType
+      type: object
+      properties:
+        originalStartDate:
+          type: string
+          description: Optional original start date for the loan.
+          x-cds-type: DateString
+        originalLoanAmount:
+          type: string
+          description: Optional original loan value.
+          x-cds-type: AmountString
+        originalLoanCurrency:
+          type: string
+          description: If absent assumes `AUD`.
+          default: AUD
+          x-cds-type: CurrencyString
+        loanEndDate:
+          type: string
+          description: Date that the loan is due to be repaid in full.
+          x-cds-type: DateString
+        nextInstalmentDate:
+          type: string
+          description: Next date that an instalment is required.
+          x-cds-type: DateString
+        minInstalmentAmount:
+          type: string
+          description: Minimum amount of next instalment.
+          x-cds-type: AmountString
+        minInstalmentCurrency:
+          type: string
+          description: If absent assumes `AUD`.
+          default: AUD
+          x-cds-type: CurrencyString
+        maxRedraw:
+          type: string
+          description: Maximum amount of funds that can be redrawn. If not present redraw is not available even if the feature exists for the account.
+          x-cds-type: AmountString
+        maxRedrawCurrency:
+          type: string
+          description: If absent assumes `AUD`.
+          default: AUD
+          x-cds-type: CurrencyString
+        minRedraw:
+          type: string
+          description: Minimum redraw amount.
+          x-cds-type: AmountString
+        minRedrawCurrency:
+          type: string
+          description: If absent assumes `AUD`.
+          default: AUD
+          x-cds-type: CurrencyString
+        offsetAccountEnabled:
+          type: boolean
+          description: Set to `true` if one or more offset accounts are configured for this loan account.
+        offsetAccountIds:
+          type: array
+          description: The _accountId_ values of the configured offset accounts attached to this loan. Only offset accounts that can be accessed under the current authorisation should be included. It is expected behaviour that _offsetAccountEnabled_ is set to `true` but the _offsetAccountIds_ field is absent or empty. This represents a situation where an offset account exists but details can not be accessed under the current authorisation.
+          items:
+            $ref: '#/components/schemas/BankingAccountId'
+        repaymentType:
+          type: string
+          description: Option in place for repayments.
+          enum:
+          - INTEREST_ONLY
+          - OTHER
+          - PRINCIPAL_AND_INTEREST
+          - UNCONSTRAINED
+        repaymentFrequency:
+          type: string
+          description: The expected or required repayment frequency. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax).
+          x-cds-type: ExternalRef
+    BankingTermDepositAccount:
+      required:
+      - lodgementDate
+      - maturityDate
+      - maturityInstructions
+      type: object
+      properties:
+        lodgementDate:
+          type: string
+          description: The lodgement date of the original deposit.
+          x-cds-type: DateString
+        maturityDate:
+          type: string
+          description: Maturity date for the term deposit.
+          x-cds-type: DateString
+        maturityAmount:
+          type: string
+          description: Amount to be paid upon maturity. If absent it implies the amount to paid is variable and cannot currently be calculated.
+          x-cds-type: AmountString
+        maturityCurrency:
+          type: string
+          description: If absent assumes `AUD`.
+          default: AUD
+          x-cds-type: CurrencyString
+        maturityInstructions:
+          type: string
+          description: Current instructions on action to be taken at maturity. This includes default actions that may be specified in the terms and conditions for the product e.g., roll-over to the same term and frequency of interest payments.
+          enum:
+          - HOLD_ON_MATURITY
+          - PAID_OUT_AT_MATURITY
+          - ROLLED_OVER
+    BankingProductCategoryV2:
+      type: string
+      description: The category to which a product or account belongs. See [here](#product-categories) for more details.
+      enum:
+      - BUSINESS_LOANS
+      - BUY_NOW_PAY_LATER
+      - CRED_AND_CHRG_CARDS
+      - LEASES
+      - MARGIN_LOANS
+      - OVERDRAFTS
+      - PERS_LOANS
+      - REGULATED_TRUST_ACCOUNTS
+      - RESIDENTIAL_MORTGAGES
+      - TERM_DEPOSITS
+      - TRADE_FINANCE
+      - TRANS_AND_SAVINGS_ACCOUNTS
+      - TRAVEL_CARDS
+    BankingAccountDetailV5:
+      allOf:
+      - $ref: '#/components/schemas/BankingAccountV3'
+      - type: object
+        properties:
+          bsb:
+            type: string
+            description: The unmasked BSB for the account. Is expected to be formatted as digits only with leading zeros included and no punctuation or spaces.
+          accountNumber:
+            type: string
+            description: The unmasked account number for the account. Should not be supplied if the account number is a PAN requiring PCI compliance. Is expected to be formatted as digits only with leading zeros included and no punctuation or spaces.
+          bundleName:
+            type: string
+            description: Optional field to indicate if this account is part of a bundle that is providing additional benefit to the customer.
+          instalments:
+            $ref: '#/components/schemas/BankingProductInstalments'
+          specificAccountUType:
+            type: string
+            description: The type of structure to present account specific fields.
+            enum:
+            - creditCard
+            - loan
+            - termDeposit
+          termDeposit:
+            type: array
+            description: Mandatory if the _specificAccountUType_ value is `termDeposit`.
+            items:
+              $ref: '#/components/schemas/BankingTermDepositAccount'
+          creditCard:
+            description: Mandatory if the _specificAccountUType_ value is `creditCard`.
+            allOf:
+            - $ref: '#/components/schemas/BankingCreditCardAccount'
+          loan:
+            description: Mandatory if the _specificAccountUType_ value is `loan`.
+            allOf:
+            - $ref: '#/components/schemas/BankingLoanAccountV3'
+          depositRate:
+            type: string
+            description: Current rate to calculate interest earned being applied to deposit balances as it stands at the time of the API call.
+            x-cds-type: RateString
+          lendingRate:
+            type: string
+            description: The current rate to calculate interest payable being applied to lending balances as it stands at the time of the API call.
+            x-cds-type: RateString
+          depositRates:
+            type: array
+            description: Fully described deposit rates for this account based on the equivalent structure in Product Reference.
+            items:
+              $ref: '#/components/schemas/BankingProductDepositRateV2'
+          lendingRates:
+            type: array
+            description: Fully described lending rates for this account based on the equivalent structure in Product Reference.
+            items:
+              $ref: '#/components/schemas/BankingProductLendingRateV3'
+          features:
+            type: array
+            description: Array of features of the account based on the equivalent structure in Product Reference with the following additional field.
+            items:
+              type: object
+              allOf:
+              - $ref: '#/components/schemas/BankingProductFeatureV4'
+              - type: object
+                properties:
+                  isActivated:
+                    type: string
+                    description: <ul><li>`ACTIVATED` if the feature has been activated by the customer or is a standard feature of the product</li><li>`NOT_ACTIVATED` if the feature is not activated but is available for activation</li><li>`UNKNOWN` or absent if the activation state is unknown.</ul>**Note:** This is an additional field appended to the feature structure defined in the Product Reference payload.
+                    enum:
+                    - ACTIVATED
+                    - NOT_ACTIVATED
+                    - UNKNOWN
+                    default: UNKNOWN
+          fees:
+            type: array
+            description: Fees and charges applicable to the account based on the equivalent structure in Product Reference.
+            items:
+              $ref: '#/components/schemas/BankingProductFeeV2'
+          addresses:
+            type: array
+            description: The addresses for the account to be used for correspondence.
+            items:
+              $ref: '#/components/schemas/CommonPhysicalAddress'
+        x-conditional:
+        - termDeposit
+        - creditCard
+        - loan
+    BankingProductFeeV2:
+      required:
+      - name
+      - feeType
+      - feeMethodUType
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the fee.
+        feeType:
+          type: string
+          description: The type of fee. For further details, refer to [Product Fee Types](#tocSproductfeetypedoc).
+          enum:
+          - CASH_ADVANCE
+          - DEPOSIT
+          - DISHONOUR
+          - ENQUIRY
+          - EVENT
+          - EXIT
+          - LATE_PAYMENT
+          - OTHER
+          - PAYMENT
+          - PERIODIC
+          - PURCHASE
+          - REPLACEMENT
+          - TRANSACTION
+          - UPFRONT
+          - UPFRONT_PER_PLAN
+          - VARIATION
+          - WITHDRAWAL
+          example: CASH_ADVANCE
+        feeMethodUType:
+          type: string
+          description: Reference to the applicable fee charging method structure.
+          enum:
+          - fixedAmount
+          - rateBased
+          - variable
+        fixedAmount:
+          description: Mandatory if the _feeMethodUType_ value is `fixedAmount`. Where the fee is a specific amount.
+          allOf:
+          - $ref: '#/components/schemas/BankingFeeAmount'
+        rateBased:
+          description: Mandatory if the _feeMethodUType_ value is `rateBased`. Where the fee is based on a type of rate.
+          allOf:
+          - $ref: '#/components/schemas/BankingFeeRate'
+        variable:
+          description: Mandatory if the _feeMethodUType_ value is `variable`. Where the amount or rate may not be known until the fee is incurred.
+          allOf:
+          - $ref: '#/components/schemas/BankingFeeRange'
+        feeCap:
+          type: string
+          description: The cap amount if multiple occurrences of the fee are capped to a limit.
+          x-cds-type: AmountString
+        feeCapPeriod:
+          type: string
+          description: Specifies a duration over which multiple occurrences of the fee will be capped. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax).
+          x-cds-type: ExternalRef
+        currency:
+          type: string
+          description: The currency the fee will be charged in. Assumes `AUD` if absent.
+          default: AUD
+          x-cds-type: CurrencyString
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the [_feeType_](#tocSproductfeetypedoc) specified. Whether mandatory or not is dependent on the value of [_feeType_](#tocSproductfeetypedoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the fee. Mandatory if the [_feeType_](#tocSproductfeetypedoc) value is `OTHER`.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this fee.
+          x-cds-type: URIString
+        discounts:
+          type: array
+          description: An optional list of discounts to this fee that may be available.
+          items:
+            $ref: '#/components/schemas/BankingProductDiscountV2'
+      x-conditional:
+      - fixedAmount
+      - rateBased
+      - variable
+      - additionalValue
+      - additionalInfo
+    BankingProductRateTierV4:
+      required:
+      - minimumValue
+      - name
+      - unitOfMeasure
+      type: object
+      properties:
+        name:
+          type: string
+          description: A display name for the tier.
+        unitOfMeasure:
+          type: string
+          description: The unit of measure that applies to the _minimumValue_ and _maximumValue_ values, e.g.,<ul><li>`DOLLAR` for a dollar amount (with values in AmountString format)<li>`PERCENT` for Loan-to-Value Ratio or LVR (with values in RateString format)<li>`MONTH` or `DAY` for a period representing a discrete number of months or days for a fixed-term deposit or loan (with values as a string containing a positive integer).</ul>
+          enum:
+          - DAY
+          - DOLLAR
+          - MONTH
+          - PERCENT
+        minimumValue:
+          type: string
+          description: The number of _unitOfMeasure_ units that form the lower bound of the tier. The tier should be inclusive of this value.
+        maximumValue:
+          type: string
+          description: 'The number of _unitOfMeasure_ units that form the upper bound of the tier or band. For a tier with a discrete value (as opposed to a range of values e.g., 1 month) this must be the same as _minimumValue_. Where this is the same as the _minimumValue_ value of the next-higher tier the referenced tier should be exclusive of this value. For example a term deposit of 2 months falls into the upper tier of the following tiers: (1 – 2 months, 2 – 3 months). If absent the tier''s range has no upper bound.'
+        rateApplicationMethod:
+          type: string
+          description: The method used to calculate the amount to be applied using one or more tiers. A single rate may be applied to the entire balance or each applicable tier rate is applied to the portion of the balance that falls into that tier (referred to as 'bands' or 'steps').
+          enum:
+          - PER_TIER
+          - WHOLE_BALANCE
+        applicabilityConditions:
+          type: array
+          description: Applicability conditions for the rate tier.
+          items:
+            $ref: '#/components/schemas/BankingProductRateConditionV2'
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the rate tier.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this rate tier.
+          x-cds-type: URIString
+      description: Defines the criteria and conditions for which a rate applies.
+    BankingFeeRate:
+      type: object
+      required:
+      - rateType
+      - rate
+      properties:
+        rateType:
+          type: string
+          description: Type of fee rate calculation.<ul><li>`BALANCE` A fee rate based on a balance</li><li>`INTEREST_ACCRUED` A fee rate based on interest accrued</li><li>`TRANSACTION` A fee rate based on a transaction.</li></ul>
+          enum:
+          - BALANCE
+          - INTEREST_ACCRUED
+          - TRANSACTION
+        rate:
+          type: string
+          x-cds-type: RateString
+          description: The fee rate calculated according to the _rateType_.
+        accrualFrequency:
+          type: string
+          description: The indicative frequency with which the fee is calculated on the account if applicable. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax).
+          x-cds-type: ExternalRef
+        amountRange:
+          $ref: '#/components/schemas/BankingFeeRange'
+      x-conditional:
+      - balanceRate
+      - transactionRate
+      - accruedRate
+    BankingProductRateConditionV2:
+      type: object
+      description: Defines a condition for the applicability of a rate.
+      properties:
+        rateApplicabilityType:
+          type: string
+          description: Category of applicability condition associated with the rate. For more information refer to [Rate and Tier Applicability Types](#tocSbankingproductrateconditiondoc).
+          enum:
+          - MIN_DEPOSITS
+          - MIN_DEPOSIT_AMOUNT
+          - DEPOSIT_BALANCE_INCREASED
+          - EXISTING_CUST
+          - NEW_ACCOUNTS
+          - NEW_CUSTOMER
+          - NEW_CUSTOMER_TO_GROUP
+          - ONLINE_ONLY
+          - OTHER
+          - MIN_PURCHASES
+          - MAX_WITHDRAWALS
+          - MAX_WITHDRAWAL_AMOUNT
+          example: NEW_CUSTOMER
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the _rateApplicabilityType_ specified. Whether mandatory or not is dependent on the value of [_rateApplicabilityType_](#tocSbankingproductrateconditiondoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the condition. Mandatory if the [_rateApplicabilityType_](#tocSbankingproductrateconditiondoc) value is `OTHER`.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this condition.
+          x-cds-type: URIString
+      required:
+      - rateApplicabilityType
+      x-conditional:
+      - additionalValue
+      - additionalInfo
+    CommonPAFAddress:
+      required:
+      - localityName
+      - postcode
+      - state
+      type: object
+      properties:
+        dpid:
+          type: string
+          description: Unique identifier for an address as defined by Australia Post. Also known as Delivery Point Identifier.
+        thoroughfareNumber1:
+          type: integer
+          description: Thoroughfare number for a property (first number in a property ranged address).
+          x-cds-type: PositiveInteger
+        thoroughfareNumber1Suffix:
+          type: string
+          description: Suffix for the thoroughfare number. Only relevant if _thoroughfareNumber1_ is populated.
+        thoroughfareNumber2:
+          type: integer
+          description: Second thoroughfare number (only used if the property has a ranged address, e.g., 23-25).
+          x-cds-type: PositiveInteger
+        thoroughfareNumber2Suffix:
+          type: string
+          description: Suffix for the second thoroughfare number. Only relevant if _thoroughfareNumber2_ is populated.
+        flatUnitType:
+          type: string
+          description: Type of flat or unit for the address.
+        flatUnitNumber:
+          type: string
+          description: Unit number (including suffix, if applicable).
+        floorLevelType:
+          type: string
+          description: Type of floor or level for the address.
+        floorLevelNumber:
+          type: string
+          description: Floor or level number (including alpha characters).
+        lotNumber:
+          type: string
+          description: Allotment number for the address.
+        buildingName1:
+          type: string
+          description: Building/Property name 1.
+        buildingName2:
+          type: string
+          description: Building/Property name 2.
+        streetName:
+          type: string
+          description: The name of the street.
+        streetType:
+          type: string
+          description: The street type. Valid enumeration defined by Australia Post PAF code file.
+        streetSuffix:
+          type: string
+          description: The street type suffix. Valid enumeration defined by Australia Post PAF code file.
+        postalDeliveryType:
+          type: string
+          description: Postal delivery type. (e.g., PO BOX). Valid enumeration defined by Australia Post PAF code file.
+        postalDeliveryNumber:
+          type: integer
+          description: Postal delivery number if the address is a postal delivery type.
+          x-cds-type: PositiveInteger
+        postalDeliveryNumberPrefix:
+          type: string
+          description: Postal delivery number prefix related to the postal delivery number.
+        postalDeliveryNumberSuffix:
+          type: string
+          description: Postal delivery number suffix related to the postal delivery number.
+        localityName:
+          type: string
+          description: Full name of locality.
+        postcode:
+          type: string
+          description: Postcode for the locality.
+        state:
+          type: string
+          description: State in which the address belongs. Valid enumeration defined by Australia Post PAF code file [State Type Abbreviation](https://auspost.com.au/content/dam/auspost_corp/media/documents/australia-post-data-guide.pdf). `NSW`, `QLD`, `VIC`, `NT`, `WA`, `SA`, `TAS`, `ACT`, `AAT`.
+      description: Australian address formatted according to the file format defined by the [PAF file format](https://auspost.com.au/content/dam/auspost_corp/media/documents/australia-post-data-guide.pdf). Mandatory if the _addressUType_ value is `paf`.
+    ResponseBankingAccountByIdV5:
+      required:
+      - data
+      - links
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BankingAccountDetailV5'
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    BankingProductFeatureV4:
+      required:
+      - featureType
+      type: object
+      properties:
+        featureType:
+          type: string
+          description: The type of feature described. For further details, refer to [Product Feature Types](#tocSproductfeaturetypedoc).
+          enum:
+          - ADDITIONAL_CARDS
+          - BALANCE_TRANSFERS
+          - BILL_PAYMENT
+          - BONUS_REWARDS
+          - CARD_ACCESS
+          - CASHBACK_OFFER
+          - COMPLEMENTARY_PRODUCT_DISCOUNTS
+          - EXTRA_DOWN_PAYMENT
+          - DIGITAL_BANKING
+          - DIGITAL_WALLET
+          - DONATE_INTEREST
+          - EXTRA_REPAYMENTS
+          - FRAUD_PROTECTION
+          - FREE_TXNS
+          - FREE_TXNS_ALLOWANCE
+          - FUNDS_AVAILABLE_AFTER
+          - GUARANTOR
+          - INSTALMENT_PLAN
+          - INSURANCE
+          - INTEREST_FREE
+          - INTEREST_FREE_TRANSFERS
+          - LOYALTY_PROGRAM
+          - NOTIFICATIONS
+          - NPP_ENABLED
+          - NPP_PAYID
+          - OFFSET
+          - OTHER
+          - OVERDRAFT
+          - REDRAW
+          - RELATIONSHIP_MANAGEMENT
+          - UNLIMITED_TXNS
+        additionalValue:
+          type: string
+          description: Generic field containing additional information relevant to the [_featureType_](#tocSproductfeaturetypedoc) specified. Whether mandatory or not is dependent on the value of the [_featureType_](#tocSproductfeaturetypedoc).
+        additionalInfo:
+          type: string
+          description: Display text providing more information on the feature. Mandatory if the [_featureType_](#tocSproductfeaturetypedoc) value is `OTHER`.
+        additionalInfoUri:
+          type: string
+          description: Link to a web page with more information on this feature.
+          x-cds-type: URIString
+      x-conditional:
+      - additionalValue
+      - additionalInfo
+    BankingProductInstalments:
+      description: Details of instalment features on the account.
+      required:
+      - minimumSplit
+      - maximumSplit
+      type: object
+      properties:
+        maximumConcurrentPlans:
+          type: integer
+          description: Maximum number of concurrent active instalment plans that may be created on the account. If `null`, there is no predetermined maximum number.
+          x-cds-type: NaturalNumber
+        instalmentsLimit:
+          type: string
+          description: Maximum combined limit of all instalment plans that may be created on the account. If `null` or not present, an opened account balance _creditLimit_ may be assumed to provide a maximum limit for instalments.
+          x-cds-type: AmountString
+        minimumPlanValue:
+          type: string
+          description: Minimum value that can be opened as an instalment plan.
+          x-cds-type: AmountString
+        maximumPlanValue:
+          type: string
+          description: Maximum value that can be opened as an instalment plan. If `null` or not present, _instalmentsLimit_ is assumed to be the maximum individual plan value.
+          x-cds-type: AmountString
+        minimumSplit:
+          type: integer
+          description: Minimum number of instalment payments a plan can be created with.
+          x-cds-type: PositiveInteger
+          example: 4
+        maximumSplit:
+          type: integer
+          description: Maximum number of instalment payments a plan can be created with.
+          x-cds-type: PositiveInteger
+          example: 4
+  parameters:
+    HeaderXV:
+      name: x-v
+      in: header
+      description: Version of the API endpoint requested by the client. Must be set to a positive integer. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If the value of [_x-min-v_](#request-headers) is equal to or higher than the value of [_x-v_](#request-headers) then the [_x-min-v_](#request-headers) header should be treated as absent. If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`. See [HTTP Headers](#request-headers).
+      required: true
+      schema:
+        type: string
+    HeaderXFAPIInteractionId:
+      name: x-fapi-interaction-id
+      in: header
+      description: An **[[RFC4122]](#nref-RFC4122)** UUID used as a correlation id. If provided, the data holder **MUST** play back this value in the _x-fapi-interaction-id_ response header. If not provided a **[[RFC4122]](#nref-RFC4122)** UUID value is required to be provided in the response header to track the interaction.
+      schema:
+        type: string
+    QueryPageSize:
+      name: page-size
+      in: query
+      description: Page size to request. Default is 25 (standard pagination).
+      schema:
+        type: integer
+        default: 25
+      x-cds-type: PositiveInteger
+    QueryBankingAccountIsOwned:
+      name: is-owned
+      in: query
+      description: Filters accounts based on whether they are owned by the authorised customer. `true` for owned accounts, `false` for unowned accounts and absent for all accounts.
+      schema:
+        type: boolean
+    HeaderXFAPIAuthDate:
+      name: x-fapi-auth-date
+      in: header
+      description: The time when the customer last logged in to the Data Recipient Software Product as described in **[[FAPI-1.0-Baseline]](#nref-FAPI-1-0-Baseline)**. Required for all resource calls (customer present and unattended). Not required for unauthenticated calls.
+      schema:
+        type: string
+      x-conditional: true
+    QueryBankingProductCategory:
+      name: product-category
+      in: query
+      description: Used to filter results on the _productCategory_ field applicable to accounts. Any one of the valid values for this field can be supplied. If absent then all accounts returned.
+      schema:
+        $ref: '#/components/schemas/BankingProductCategoryV2'
+    QueryPage:
+      name: page
+      in: query
+      description: Page of results to request (standard pagination).
+      schema:
+        type: integer
+        default: 1
+      x-cds-type: PositiveInteger
+    PathAccountId:
+      name: accountId
+      in: path
+      description: The _accountId_ to obtain data for. _accountId_ values are returned by account list endpoints.
+      required: true
+      schema:
+        $ref: '#/components/schemas/BankingAccountId'
+    QueryBankingAccountOpenStatus:
+      name: open-status
+      in: query
+      description: Used to filter results according to open/closed status. Values can be `OPEN`, `CLOSED` or `ALL`. If absent then `ALL` is assumed.
+      schema:
+        type: string
+        default: ALL
+        enum:
+        - ALL
+        - CLOSED
+        - OPEN
+    HeaderXCDSClientHeaders:
+      name: x-cds-client-headers
+      in: header
+      description: The customer's original standard http headers [Base64](#common-field-types) encoded, including the original User-Agent header, if the customer is currently logged in to the Data Recipient Software Product. Mandatory for customer present calls. Not required for unattended or unauthenticated calls.
+      schema:
+        type: string
+      x-conditional: true
+      x-cds-type: Base64
+    HeaderXFAPICustomerIPAddress:
+      name: x-fapi-customer-ip-address
+      in: header
+      description: The customer's original IP address if the customer is currently logged in to the Data Recipient Software Product. The presence of this header indicates that the API is being called in a customer present context. Not to be included for unauthenticated calls.
+      schema:
+        type: string
+    HeaderXMinV:
+      name: x-min-v
+      in: header
+      description: Minimum version of the API endpoint requested by the client. Must be set to a positive integer if provided. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`.
+      schema:
+        type: string
+  headers:
+    XV:
+      description: The [payload version](#response-headers) that the endpoint has responded with.
+      required: true
+      schema:
+        type: string
+    XFAPIInteractionId:
+      description: An **[[RFC4122]](#nref-RFC4122)** UUID used as a correlation id. If provided, the data holder **MUST** play back this value in the _x-fapi-interaction-id_ response header. If not provided a **[[RFC4122]](#nref-RFC4122)** UUID value is required to be provided in the response header to track the interaction.
+      required: true
+      schema:
+        type: string

@@ -1,0 +1,593 @@
+openapi: 3.0.3
+info:
+  title: CDR Banking Banking Account Balances Banking Account Transactions API
+  version: 1.36.0
+  description: Specifications for resource endpoints applicable to data holders in the Banking sector.
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: Data Standards Body
+    email: contact@dsb.gov.au
+    url: https://dsb.gov.au/
+servers:
+- description: MTLS
+  url: https://mtls.dh.example.com/cds-au/v1
+tags:
+- name: Banking Account Transactions
+  x-shortName: Transactions
+  description: Banking Account Transaction endpoints
+paths:
+  /banking/accounts/{accountId}/transactions:
+    get:
+      tags:
+      - Banking Account Transactions
+      summary: Get Transactions For Account
+      description: 'Obtain transactions for a specific account.
+
+
+        Some general notes that apply to all endpoints that retrieve transactions:<ul><li>Where multiple transactions are returned, transactions should be ordered according to effective date in descending order<li>As the date and time for a transaction can alter depending on status and transaction type two separate date/times are included in the payload. There are still some scenarios where neither of these time stamps is available. For the purpose of filtering and ordering it is expected that the data holder will use the "effective" date/time which will be defined as:<ul><li>Posted date/time if available, then<li>Execution date/time if available, then<li>A reasonable date/time nominated by the data holder using internal data structures</ul><li>For transaction amounts it should be assumed that a negative value indicates a reduction of the available balance on the account while a positive value indicates an increase in the available balance on the account<li>For aggregated transactions (i.e. groups of sub transactions reported as a single entry for the account) only the aggregated information, with as much consistent information across the subsidiary transactions as possible, is required to be shared.</ul>
+
+
+        Obsolete versions: [v1](includes/obsolete/get-transactions-for-account-v1.html).'
+      operationId: listBankingTransactions
+      parameters:
+      - $ref: '#/components/parameters/PathAccountId'
+      - $ref: '#/components/parameters/QueryOldestTime'
+      - $ref: '#/components/parameters/QueryNewestTime'
+      - $ref: '#/components/parameters/QueryMinAmount'
+      - $ref: '#/components/parameters/QueryMaxAmount'
+      - $ref: '#/components/parameters/QueryBankingTransactionText'
+      - $ref: '#/components/parameters/QueryPage'
+      - $ref: '#/components/parameters/QueryPageSize'
+      - $ref: '#/components/parameters/HeaderXV'
+      - $ref: '#/components/parameters/HeaderXMinV'
+      - $ref: '#/components/parameters/HeaderXFAPIInteractionId'
+      - $ref: '#/components/parameters/HeaderXFAPIAuthDate'
+      - $ref: '#/components/parameters/HeaderXFAPICustomerIPAddress'
+      - $ref: '#/components/parameters/HeaderXCDSClientHeaders'
+      responses:
+        '200':
+          $ref: '#/components/responses/ListBankingTransactions200'
+        '400':
+          $ref: '#/components/responses/ListBankingTransactions400'
+        '404':
+          $ref: '#/components/responses/ListBankingTransactions404'
+        '406':
+          $ref: '#/components/responses/ListBankingTransactions406'
+        '422':
+          $ref: '#/components/responses/ListBankingTransactions422'
+      x-scopes:
+      - bank:transactions:read
+      x-version: '2'
+  /banking/accounts/{accountId}/transactions/{transactionId}:
+    get:
+      tags:
+      - Banking Account Transactions
+      summary: Get Transaction Detail
+      description: 'Obtain detailed information on a transaction for a specific account.
+
+
+        Obsolete versions: [v1](includes/obsolete/get-transaction-detail-v1.html), [v2](includes/obsolete/get-transaction-detail-v2.html).'
+      operationId: getBankingTransactionDetail
+      parameters:
+      - $ref: '#/components/parameters/PathAccountId'
+      - name: transactionId
+        in: path
+        description: The _transactionId_ to obtain data for. _transactionId_ values are returned by transaction list endpoints.
+        required: true
+        schema:
+          $ref: '#/components/schemas/BankingTransactionId'
+      - $ref: '#/components/parameters/HeaderXV'
+      - $ref: '#/components/parameters/HeaderXMinV'
+      - $ref: '#/components/parameters/HeaderXFAPIInteractionId'
+      - $ref: '#/components/parameters/HeaderXFAPIAuthDate'
+      - $ref: '#/components/parameters/HeaderXFAPICustomerIPAddress'
+      - $ref: '#/components/parameters/HeaderXCDSClientHeaders'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetBankingTransactionDetail200'
+        '400':
+          $ref: '#/components/responses/GetBankingTransactionDetail400'
+        '404':
+          $ref: '#/components/responses/GetBankingTransactionDetail404'
+        '406':
+          $ref: '#/components/responses/GetBankingTransactionDetail406'
+      x-scopes:
+      - bank:transactions:read
+      x-version: '3'
+components:
+  schemas:
+    Meta:
+      type: object
+    BankingAccountId:
+      type: string
+      description: A unique identifier for a Banking account, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
+    ErrorV2:
+      type: object
+      required:
+      - code
+      - title
+      - detail
+      x-conditional:
+      - meta
+      properties:
+        code:
+          type: string
+          description: The code of the error encountered. Where the error is specific to the respondent, an application-specific error code, expressed as a string value. If the error is application-specific, the URN code that the specific error extends must be provided in the _meta_ object. Otherwise, the value is the error code URN.
+        title:
+          type: string
+          description: A short, human-readable summary of the problem that **MUST NOT** change from occurrence to occurrence of the problem represented by the error code.
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+        meta:
+          type: object
+          x-conditional:
+          - urn
+          description: Additional data for customised error codes.
+          properties:
+            urn:
+              type: string
+              description: The CDR error code URN which the application-specific error code extends. Mandatory if the error _code_ is an application-specific error rather than a standardised error code.
+    LinksPaginated:
+      required:
+      - self
+      type: object
+      properties:
+        self:
+          type: string
+          description: Fully qualified link that generated the current response document.
+          x-cds-type: URIString
+        first:
+          type: string
+          description: URI to the first page of this set. Mandatory if this response is not the first page.
+          x-cds-type: URIString
+        prev:
+          type: string
+          description: URI to the previous page of this set. Mandatory if this response is not the first page.
+          x-cds-type: URIString
+        next:
+          type: string
+          description: URI to the next page of this set. Mandatory if this response is not the last page.
+          x-cds-type: URIString
+        last:
+          type: string
+          description: URI to the last page of this set. Mandatory if this response is not the last page.
+          x-cds-type: URIString
+      x-conditional:
+      - prev
+      - next
+      - first
+      - last
+    ResponseBankingTransactionByIdV3:
+      required:
+      - data
+      - links
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BankingTransactionDetailV3'
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    BankingInstalmentPlanId:
+      type: string
+      description: A unique identifier for a Banking instalment plan, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
+    Links:
+      required:
+      - self
+      type: object
+      properties:
+        self:
+          type: string
+          description: Fully qualified link that generated the current response document.
+          x-cds-type: URIString
+    BankingTransactionV2:
+      required:
+      - accountId
+      - amount
+      - description
+      - isDetailAvailable
+      - reference
+      - status
+      - type
+      type: object
+      properties:
+        accountId:
+          description: Unique identifier for the account.
+          allOf:
+          - $ref: '#/components/schemas/BankingAccountId'
+        transactionId:
+          description: Unique identifier for the transaction. This is mandatory (through hashing if necessary) unless there are specific and justifiable technical reasons why a transaction cannot be uniquely identified for a particular account type. Mandatory if the _isDetailAvailable_ value is `true`.
+          allOf:
+          - $ref: '#/components/schemas/BankingTransactionId'
+        isDetailAvailable:
+          type: boolean
+          description: '`true` if extended information is available using the transaction detail endpoint. `false` if extended data is not available.'
+        type:
+          type: string
+          description: The type of the transaction.
+          enum:
+          - DIRECT_DEBIT
+          - FEE
+          - INTEREST_CHARGED
+          - INTEREST_PAID
+          - OTHER
+          - PAYMENT
+          - TRANSFER_INCOMING
+          - TRANSFER_OUTGOING
+        status:
+          type: string
+          description: Status of the transaction whether pending or posted. Note that there is currently no provision in the standards to guarantee the ability to correlate a pending transaction with an associated posted transaction.
+          enum:
+          - PENDING
+          - POSTED
+        description:
+          type: string
+          description: The transaction description as applied by the financial institution.
+        postingDateTime:
+          type: string
+          description: The time the transaction was posted. This field is Mandatory if the transaction has status `POSTED`. This is the time that appears on a standard statement.
+          x-cds-type: DateTimeString
+        valueDateTime:
+          type: string
+          description: Date and time at which assets become available to the account owner in case of a credit entry, or cease to be available to the account owner in case of a debit transaction entry.
+          x-cds-type: DateTimeString
+        executionDateTime:
+          type: string
+          description: The time the transaction was executed by the originating customer, if available.
+          x-cds-type: DateTimeString
+        amount:
+          type: string
+          description: The value of the transaction. Negative values mean money was outgoing from the account.
+          x-cds-type: AmountString
+        currency:
+          type: string
+          description: The currency for the transaction amount. `AUD` assumed if not present.
+          default: AUD
+          x-cds-type: CurrencyString
+        reference:
+          type: string
+          description: The reference for the transaction provided by the originating institution. Empty string if no data provided.
+        merchantName:
+          type: string
+          description: Name of the merchant for an outgoing payment to a merchant.
+        merchantCategoryCode:
+          type: string
+          description: The merchant category code (or MCC) for an outgoing payment to a merchant.
+        instalmentPlanId:
+          description: If the transaction is associated with an instalment plan, the corresponding _planId_ value. It should be noted that if the transaction is for a fee associated with a plan, or any amount of repayment, the _amount_ of the transaction may not match a scheduled instalment amount.
+          allOf:
+          - $ref: '#/components/schemas/BankingInstalmentPlanId'
+        billerCode:
+          type: string
+          description: BPAY Biller Code for the transaction (if available).
+        billerName:
+          type: string
+          description: Name of the BPAY biller for the transaction (if available).
+        crn:
+          type: string
+          description: BPAY CRN for the transaction (if available).<br/>Where the CRN contains sensitive information, it should be masked in line with how the Data Holder currently displays account identifiers in their existing online banking channels. If the contents of the CRN match the format of a Credit Card PAN they should be masked according to the rules applicable for [MaskedPANString](#common-field-types). If the contents are otherwise sensitive, then it should be masked using the rules applicable for the [MaskedAccountString](#common-field-types) common type.
+        apcaNumber:
+          type: string
+          description: 6 Digit APCA number for the initiating institution. The field is fixed-width and padded with leading zeros if applicable.
+      x-conditional:
+      - transactionId
+      - postingDateTime
+      - crn
+    ResponseErrorListV2:
+      type: object
+      required:
+      - errors
+      properties:
+        errors:
+          description: List of errors.
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorV2'
+    BankingTransactionDetailV3:
+      allOf:
+      - $ref: '#/components/schemas/BankingTransactionV2'
+      - required:
+        - extendedData
+        type: object
+        properties:
+          extendedData:
+            type: object
+            properties:
+              payer:
+                type: string
+                description: Label of the originating payer. Mandatory for inbound payment.
+              payee:
+                type: string
+                description: Label of the target PayID. Mandatory for an outbound payment. The name assigned to the BSB/Account Number or PayID (by the owner of the PayID).
+              extensionUType:
+                type: string
+                description: Optional extended data specific to transactions. Currently extended data is supported for NPP service overlays.
+                enum:
+                - nppPayload
+              nppPayload:
+                type: object
+                description: Mandatory if the _extensionUType_ value is `nppPayload`.
+                required:
+                - service
+                - serviceVersion
+                x-conditional:
+                - extendedDescription
+                properties:
+                  extendedDescription:
+                    type: string
+                    description: An extended string description. Mandatory if the _extensionUType_ value is `nppPayload`.
+                  endToEndId:
+                    type: string
+                    description: An end to end ID for the payment created at initiation.
+                  purposeCode:
+                    type: string
+                    x-cds-type: ExternalRef
+                    description: Purpose of the payment. Format is defined by the NPP standards for the NPP overlay services including Osko (X2P1).
+                  service:
+                    $ref: '#/components/schemas/NppPaymentService'
+                  serviceVersion:
+                    type: string
+                    x-cds-type: ExternalRef
+                    description: Two-digit NPP service overlay version with leading zero.
+                    example: '03'
+            x-conditional:
+            - payer
+            - payee
+            - nppPayload
+    MetaPaginated:
+      required:
+      - totalPages
+      - totalRecords
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          description: The total number of records in the full set. See [pagination](#pagination).
+          x-cds-type: NaturalNumber
+        totalPages:
+          type: integer
+          description: The total number of pages in the full set. See [pagination](#pagination).
+          x-cds-type: NaturalNumber
+    ResponseBankingTransactionListV2:
+      required:
+      - data
+      - links
+      - meta
+      type: object
+      properties:
+        data:
+          required:
+          - transactions
+          type: object
+          properties:
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/BankingTransactionV2'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginatedTransaction'
+    NppPaymentService:
+      type: string
+      description: Identifier of the applicable overlay service. The _service_ is used in conjunction with the _serviceVersion_. See [here](#npp-services) for more details.
+      enum:
+      - X2P1
+      - IFTI
+      - BSCT
+      - CATSCT
+      example: X2P1
+    MetaPaginatedTransaction:
+      allOf:
+      - $ref: '#/components/schemas/MetaPaginated'
+      - type: object
+        properties:
+          isQueryParamUnsupported:
+            type: boolean
+            description: '`true` if _text_ query parameter is not supported.'
+            default: false
+    BankingTransactionId:
+      type: string
+      description: A unique identifier for a Banking transaction, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
+  parameters:
+    HeaderXV:
+      name: x-v
+      in: header
+      description: Version of the API endpoint requested by the client. Must be set to a positive integer. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If the value of [_x-min-v_](#request-headers) is equal to or higher than the value of [_x-v_](#request-headers) then the [_x-min-v_](#request-headers) header should be treated as absent. If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`. See [HTTP Headers](#request-headers).
+      required: true
+      schema:
+        type: string
+    HeaderXFAPIInteractionId:
+      name: x-fapi-interaction-id
+      in: header
+      description: An **[[RFC4122]](#nref-RFC4122)** UUID used as a correlation id. If provided, the data holder **MUST** play back this value in the _x-fapi-interaction-id_ response header. If not provided a **[[RFC4122]](#nref-RFC4122)** UUID value is required to be provided in the response header to track the interaction.
+      schema:
+        type: string
+    QueryMinAmount:
+      name: min-amount
+      in: query
+      description: Filter transactions to only transactions with amounts higher than or equal to this amount.
+      schema:
+        type: string
+      x-cds-type: AmountString
+    QueryPageSize:
+      name: page-size
+      in: query
+      description: Page size to request. Default is 25 (standard pagination).
+      schema:
+        type: integer
+        default: 25
+      x-cds-type: PositiveInteger
+    HeaderXFAPIAuthDate:
+      name: x-fapi-auth-date
+      in: header
+      description: The time when the customer last logged in to the Data Recipient Software Product as described in **[[FAPI-1.0-Baseline]](#nref-FAPI-1-0-Baseline)**. Required for all resource calls (customer present and unattended). Not required for unauthenticated calls.
+      schema:
+        type: string
+      x-conditional: true
+    QueryBankingTransactionText:
+      name: text
+      in: query
+      description: Filter transactions to only transactions where this string value is found as a substring of either the _reference_ or _description_ fields. Format is arbitrary ASCII string. This parameter is optionally implemented by data holders. If it is not implemented then a response should be provided as normal without text filtering applied and an additional boolean field named _isQueryParamUnsupported_ should be included in the meta object and set to `true` (whether the text parameter is supplied or not).
+      schema:
+        type: string
+    QueryPage:
+      name: page
+      in: query
+      description: Page of results to request (standard pagination).
+      schema:
+        type: integer
+        default: 1
+      x-cds-type: PositiveInteger
+    PathAccountId:
+      name: accountId
+      in: path
+      description: The _accountId_ to obtain data for. _accountId_ values are returned by account list endpoints.
+      required: true
+      schema:
+        $ref: '#/components/schemas/BankingAccountId'
+    QueryMaxAmount:
+      name: max-amount
+      in: query
+      description: Filter transactions to only transactions with amounts less than or equal to this amount.
+      schema:
+        type: string
+      x-cds-type: AmountString
+    HeaderXCDSClientHeaders:
+      name: x-cds-client-headers
+      in: header
+      description: The customer's original standard http headers [Base64](#common-field-types) encoded, including the original User-Agent header, if the customer is currently logged in to the Data Recipient Software Product. Mandatory for customer present calls. Not required for unattended or unauthenticated calls.
+      schema:
+        type: string
+      x-conditional: true
+      x-cds-type: Base64
+    QueryOldestTime:
+      name: oldest-time
+      in: query
+      description: Constrain the transaction history request to transactions with effective time at or after this date/time. If absent defaults to _newest-time_ minus 90 days. Format is aligned to [DateTimeString](#common-field-types) common type.
+      schema:
+        type: string
+      x-cds-type: DateTimeString
+    QueryNewestTime:
+      name: newest-time
+      in: query
+      description: Constrain the transaction history request to transactions with effective time at or before this date/time. If absent defaults to today. Format is aligned to [DateTimeString](#common-field-types) common type.
+      schema:
+        type: string
+      x-cds-type: DateTimeString
+    HeaderXFAPICustomerIPAddress:
+      name: x-fapi-customer-ip-address
+      in: header
+      description: The customer's original IP address if the customer is currently logged in to the Data Recipient Software Product. The presence of this header indicates that the API is being called in a customer present context. Not to be included for unauthenticated calls.
+      schema:
+        type: string
+    HeaderXMinV:
+      name: x-min-v
+      in: header
+      description: Minimum version of the API endpoint requested by the client. Must be set to a positive integer if provided. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`.
+      schema:
+        type: string
+  responses:
+    ListBankingTransactions400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li><li>[400 - Invalid Date](#error-400-field-invalid-date-time)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingTransactions200:
+      description: Successful response
+      headers:
+        x-v:
+          $ref: '#/components/headers/XV'
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBankingTransactionListV2'
+    GetBankingTransactionDetail200:
+      description: Successful response
+      headers:
+        x-v:
+          $ref: '#/components/headers/XV'
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBankingTransactionByIdV3'
+    GetBankingTransactionDetail400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Date](#error-400-field-invalid-date-time)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    GetBankingTransactionDetail406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingTransactions404:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingTransactions422:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    GetBankingTransactionDetail404:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li><li>[404 - Unavailable Resource](#error-404-resource-unavailable)</li><li>[404 - Invalid Resource](#error-404-resource-invalid)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListBankingTransactions406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+  headers:
+    XV:
+      description: The [payload version](#response-headers) that the endpoint has responded with.
+      required: true
+      schema:
+        type: string
+    XFAPIInteractionId:
+      description: An **[[RFC4122]](#nref-RFC4122)** UUID used as a correlation id. If provided, the data holder **MUST** play back this value in the _x-fapi-interaction-id_ response header. If not provided a **[[RFC4122]](#nref-RFC4122)** UUID value is required to be provided in the response header to track the interaction.
+      required: true
+      schema:
+        type: string
