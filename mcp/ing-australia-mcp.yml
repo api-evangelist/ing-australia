@@ -2,55 +2,59 @@ generated: '2026-07-20'
 method: derived
 status: candidate
 source: openapi/ing-australia-cds-banking-products-openapi.yml
-description: >-
-  Candidate MCP tool surface derived from the CDS Banking operations. ING Australia
-  does not publish an official hosted MCP server. The PRODUCT tools (list/get
-  products) map to the public, unauthenticated PRD endpoints and are safe to expose
-  to an agent directly; every other tool requires a CDR consumer-data-sharing
-  session under FAPI OAuth2 and can only run inside an Accredited Data Recipient
-  context. All tools are read-only.
+description: Candidate MCP tool surface derived from the CDS Banking operations. ING Australia does not
+  publish an official hosted MCP server. The PRODUCT tools (list/get products) map to the public, unauthenticated
+  PRD endpoints and are safe to expose to an agent directly; every other tool requires a CDR consumer-data-sharing
+  session under FAPI OAuth2 and can only run inside an Accredited Data Recipient context. All tools are
+  read-only.
 server:
   name: ing-australia-cds-banking
   transport: http
   url: null
 tools:
-  - name: list_banking_products
-    description: List ING's publicly offered banking products (public, unauthenticated).
-    auth: none
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingProducts
-  - name: get_banking_product_detail
-    description: Get full detail for one publicly offered product (public, unauthenticated).
-    auth: none
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingProductDetail
-  - name: list_banking_accounts
-    description: List the customer's accounts.
-    auth: cdr-oauth2 (bank:accounts.basic:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingAccounts
-  - name: get_banking_account_detail
-    description: Get detail for one account.
-    auth: cdr-oauth2 (bank:accounts.detail:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingAccountDetail
-  - name: get_banking_balance
-    description: Get the balance for a single account.
-    auth: cdr-oauth2 (bank:accounts.basic:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingBalance
-  - name: list_banking_transactions
-    description: List transactions for an account.
-    auth: cdr-oauth2 (bank:transactions:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingTransactions
-  - name: get_banking_transaction_detail
-    description: Get detail for one transaction.
-    auth: cdr-oauth2 (bank:transactions:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingTransactionDetail
-  - name: list_banking_payees
-    description: List the customer's saved payees.
-    auth: cdr-oauth2 (bank:payees:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingPayees
-  - name: list_direct_debits
-    description: List direct debit authorisations for an account.
-    auth: cdr-oauth2 (bank:regular_payments:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listDirectDebits
-  - name: list_scheduled_payments
-    description: List scheduled payments for an account.
-    auth: cdr-oauth2 (bank:regular_payments:read)
-    source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listScheduledPayments
+- name: list_banking_products
+  description: List ING's publicly offered banking products (public, unauthenticated).
+  auth: none
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingProducts
+- name: get_banking_product_detail
+  description: Get full detail for one publicly offered product (public, unauthenticated).
+  auth: none
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingProductDetail
+- name: list_banking_accounts
+  description: List the customer's accounts.
+  auth: cdr-oauth2 (bank:accounts.basic:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingAccounts
+- name: get_banking_account_detail
+  description: Get detail for one account.
+  auth: cdr-oauth2 (bank:accounts.detail:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingAccountDetail
+- name: get_banking_balance
+  description: Get the balance for a single account.
+  auth: cdr-oauth2 (bank:accounts.basic:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingBalance
+- name: list_banking_transactions
+  description: List transactions for an account.
+  auth: cdr-oauth2 (bank:transactions:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingTransactions
+- name: get_banking_transaction_detail
+  description: Get detail for one transaction.
+  auth: cdr-oauth2 (bank:transactions:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#getBankingTransactionDetail
+- name: list_banking_payees
+  description: List the customer's saved payees.
+  auth: cdr-oauth2 (bank:payees:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listBankingPayees
+- name: list_direct_debits
+  description: List direct debit authorisations for an account.
+  auth: cdr-oauth2 (bank:regular_payments:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listDirectDebits
+- name: list_scheduled_payments
+  description: List scheduled payments for an account.
+  auth: cdr-oauth2 (bank:regular_payments:read)
+  source_operation: openapi/ing-australia-cds-banking-products-openapi.yml#listScheduledPayments
+deployment:
+  mode: none
+  verified: derived
+  tools: 10
+  checked: '2026-08-12'
+  source: catalog MCP census
