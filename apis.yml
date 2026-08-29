@@ -14,6 +14,18 @@ description: ING Australia is the retail banking division of ING Bank (Australia
   to the Consumer Data Standards (CDS). Authenticated consumer-data sharing follows
   the CDR ecosystem model (OAuth2 / OIDC FAPI profile via accredited data recipients);
   ING does not operate a broad, self-serve public developer portal.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
