@@ -165,6 +165,9 @@ apis:
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#banking-apis
 common:
+- type: CapabilityMap
+  url: capabilities/ing-australia-capability-edges.yml
+  name: ING Australia Business Capability Map
 - type: AgenticAccess
   url: agentic-access/ing-australia-agentic-access.yml
 - type: DomainSecurity

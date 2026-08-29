@@ -1,0 +1,64 @@
+slug: ing-australia
+provider: ING Australia
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Banking & Capital Markets
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 5
+edges:
+- tag: Banking Products
+  spec_file: ing-australia-banking-products-api-openapi.yml
+  capability_id: BC-1310.10
+  capability_id_l1: BC-1310
+  capability_name: Product Catalogue Management
+  confidence: 0.85
+  evidence: GET /banking/products  listBankingProducts  Get Products, schema BankingProductDetailV7, BankingProductFeatureV4,
+    BankingProductDepositRateV2
+  reason: Publishes the bank's product catalogue with features, rates and fees — banking product catalogue
+    management.
+- tag: Banking Account Scheduled Payments
+  spec_file: ing-australia-banking-account-scheduled-payments-api-openapi.yml
+  capability_id: BC-1340.10
+  capability_id_l1: BC-1340
+  capability_name: Payment Initiation Management
+  confidence: 0.75
+  evidence: GET /banking/payments/scheduled  listScheduledPaymentsBulk  Get Scheduled Payments Bulk, schema
+    BankingScheduledPaymentRecurrence
+  reason: Scheduled payment instructions and payee/recurrence details are payment initiation instruction
+    data in the CDR banking surface.
+- tag: Banking Account Balances
+  spec_file: ing-australia-banking-account-balances-api-openapi.yml
+  capability_id: BC-1330.10
+  capability_id_l1: BC-1330
+  capability_name: Deposit Account Management
+  confidence: 0.7
+  evidence: GET /banking/accounts/{accountId}/balance  getBankingBalance  Get Account Balance
+  reason: CDR open banking balance retrieval for deposit/transaction accounts; account information servicing
+    of deposit accounts. Sub-capability choice somewhat uncertain (could be customer servicing).
+- tag: Banking Accounts
+  spec_file: ing-australia-banking-accounts-api-openapi.yml
+  capability_id: BC-1330.10
+  capability_id_l1: BC-1330
+  capability_name: Deposit Account Management
+  confidence: 0.7
+  evidence: GET /banking/accounts/{accountId}  getBankingAccountDetail, schemas BankingTermDepositAccount,
+    BankingCreditCardAccount, BankingLoanAccountV3
+  reason: Account master data for deposit, term deposit, loan and card accounts; primarily deposit account
+    information exposure under CDR.
+- tag: Banking Payees
+  spec_file: ing-australia-banking-payees-api-openapi.yml
+  capability_id: BC-1340.10
+  capability_id_l1: BC-1340
+  capability_name: Payment Initiation Management
+  confidence: 0.7
+  evidence: GET /banking/payees  listBankingPayees  Get Payees, schemas BankingDomesticPayee, BankingInternationalPayee,
+    BankingBillerPayee
+  reason: Payee registry underpinning payment instruction capture; part of payment initiation data in
+    the CDR banking API.
