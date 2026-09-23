@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: CDR Banking Banking Account Balances Banking Account Scheduled Payments API
+  title: CDR Banking Banking Account Scheduled Payments API
   version: 1.36.0
   description: Specifications for resource endpoints applicable to data holders in the Banking sector.
   license:
@@ -26,7 +26,7 @@ paths:
       description: 'Obtain scheduled, outgoing payments for a specific account.
 
 
-        Obsolete versions: [v1](includes/obsolete/get-scheduled-payments-for-account-v1.html).'
+        Obsolete versions: v1.'
       operationId: listScheduledPayments
       parameters:
       - $ref: '#/components/parameters/PathAccountId'
@@ -60,7 +60,7 @@ paths:
       description: 'Obtain scheduled payments for multiple, filtered accounts that are the source of funds for the payments.
 
 
-        Obsolete versions: [v1](includes/obsolete/get-scheduled-payments-bulk-v1.html), [v2](includes/obsolete/get-scheduled-payments-bulk-v2.html).'
+        Obsolete versions: v1, v2.'
       operationId: listScheduledPaymentsBulk
       parameters:
       - $ref: '#/components/parameters/QueryBankingProductCategory'
@@ -93,7 +93,7 @@ paths:
       description: 'Obtain scheduled payments for a specified list of accounts.
 
 
-        Obsolete versions: [v1](includes/obsolete/get-scheduled-payments-for-specific-accounts-v1.html).'
+        Obsolete versions: v1.'
       operationId: listScheduledPaymentsSpecificAccounts
       parameters:
       - $ref: '#/components/parameters/QueryPage'
@@ -123,7 +123,7 @@ paths:
       tags:
       - Banking Account Scheduled Payments
       summary: Get Instalment Plans for Account
-      description: Obtain instalment plans for a single specified account. The response **MUST** be ordered by plan _creationDate_ in descending order. If _isInstalmentDetailAvailable_ was specified as `true` for the provided _accountId_ but no plans match the provided parameters, an empty array **MUST** be returned. If _isInstalmentDetailAvailable_ was specified as `false` for the provided _accountId_, then the endpoint **MAY** respond with [404 - Resource Not Implemented](#error-404-resource-not-implemented).
+      description: Obtain instalment plans for a single specified account. The response **MUST** be ordered by plan _creationDate_ in descending order. If _isInstalmentDetailAvailable_ was specified as `true` for the provided _accountId_ but no plans match the provided parameters, an empty array **MUST** be returned. If _isInstalmentDetailAvailable_ was specified as `false` for the provided _accountId_, then the endpoint **MAY** respond with 404 - Resource Not Implemented.
       operationId: listInstalmentPlans
       parameters:
       - $ref: '#/components/parameters/PathAccountId'
@@ -155,7 +155,7 @@ paths:
       tags:
       - Banking Account Scheduled Payments
       summary: Get Instalment Plans Bulk
-      description: Obtain instalment plans for multiple accounts. The response **MUST** be ordered by plan _creationDate_ in descending order. If instalments are not supported for any account type, the endpoint **MAY** respond with [404 - Resource Not Implemented](#error-404-resource-not-implemented).
+      description: Obtain instalment plans for multiple accounts. The response **MUST** be ordered by plan _creationDate_ in descending order. If instalments are not supported for any account type, the endpoint **MAY** respond with 404 - Resource Not Implemented.
       operationId: listInstalmentPlansBulk
       parameters:
       - $ref: '#/components/parameters/QueryPlanStatus'
@@ -181,6 +181,122 @@ paths:
       x-version: '1'
 components:
   schemas:
+    BankingDomesticPayeePayId:
+      required:
+      - identifier
+      - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name assigned to the PayID by the owner of the PayID.
+        identifier:
+          type: string
+          description: The identifier of the PayID (dependent on type).
+        type:
+          type: string
+          description: The type of the PayID.
+          enum:
+          - ABN
+          - EMAIL
+          - ORG_IDENTIFIER
+          - TELEPHONE
+    BankingDomesticPayee:
+      required:
+      - payeeAccountUType
+      type: object
+      properties:
+        payeeAccountUType:
+          type: string
+          description: 'Type of account object included. Valid values are: <ul><li>`account` A standard Australian account defined by BSB/Account Number.<li>`card` A credit or charge card to pay to (note that PANs are masked).<li>`payId` A PayID recognised by NPP.</ul>'
+          enum:
+          - account
+          - card
+          - payId
+        account:
+          $ref: '#/components/schemas/BankingDomesticPayeeAccount'
+        card:
+          $ref: '#/components/schemas/BankingDomesticPayeeCard'
+        payId:
+          $ref: '#/components/schemas/BankingDomesticPayeePayId'
+      x-conditional:
+      - account
+      - card
+      - payId
+    BankingPayeeId:
+      type: string
+      description: A unique identifier for a Banking payee, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
+    BankingProductCategoryV2:
+      type: string
+      description: The category to which a product or account belongs. See [here](#product-categories) for more details.
+      enum:
+      - BUSINESS_LOANS
+      - BUY_NOW_PAY_LATER
+      - CRED_AND_CHRG_CARDS
+      - LEASES
+      - MARGIN_LOANS
+      - OVERDRAFTS
+      - PERS_LOANS
+      - REGULATED_TRUST_ACCOUNTS
+      - RESIDENTIAL_MORTGAGES
+      - TERM_DEPOSITS
+      - TRADE_FINANCE
+      - TRANS_AND_SAVINGS_ACCOUNTS
+      - TRAVEL_CARDS
+    RequestAccountIdListV1:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: object
+          required:
+          - accountIds
+          properties:
+            accountIds:
+              type: array
+              description: Array of _accountId_ values to obtain data for.
+              items:
+                $ref: '#/components/schemas/BankingAccountId'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    BankingScheduledPaymentSetV2:
+      required:
+      - to
+      type: object
+      properties:
+        to:
+          $ref: '#/components/schemas/BankingScheduledPaymentToV2'
+        isAmountCalculated:
+          type: boolean
+          description: Flag indicating whether the amount of the payment is calculated based on the context of the event. For instance a payment to reduce the balance of a credit card to zero. If absent then `false` is assumed.
+          default: false
+        amount:
+          type: string
+          description: The amount of the next payment if known. Mandatory unless the _isAmountCalculated_ field is set to `true`. Must be zero or positive if present.
+          x-cds-type: AmountString
+        currency:
+          type: string
+          description: The currency for the payment. `AUD` assumed if not present.
+          default: AUD
+          x-cds-type: CurrencyString
+      description: The set of payment amounts and destination accounts for this payment accommodating multi-part payments. A single entry indicates a simple payment with one destination account. Must have at least one entry.
+      x-conditional:
+      - amount
+    BankingScheduledPaymentRecurrenceEventBased:
+      required:
+      - description
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the event and conditions that will result in the payment. Expected to be formatted for display to a customer.
+      description: Indicates that the schedule of payments is defined according to an external event that cannot be predetermined. Mandatory if the _recurrenceUType_ value is `eventBased`.
+    BankingAccountId:
+      type: string
+      description: A unique identifier for a Banking account, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
     BankingDomesticPayeeAccount:
       required:
       - accountNumber
@@ -196,10 +312,201 @@ components:
         accountNumber:
           type: string
           description: Number of the account to pay to.
-    BankingPayeeId:
-      type: string
-      description: A unique identifier for a Banking payee, generated according to [CDR ID Permanence](#id-permanence) requirements.
-      x-cds-type: ASCIIString
+    Meta:
+      type: object
+    BankingInternationalPayee:
+      required:
+      - bankDetails
+      - beneficiaryDetails
+      type: object
+      properties:
+        beneficiaryDetails:
+          required:
+          - country
+          type: object
+          properties:
+            name:
+              type: string
+              description: Name of the beneficiary.
+            country:
+              type: string
+              description: Country where the beneficiary resides. A valid [ISO 3166 Alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
+              x-cds-type: ExternalRef
+            message:
+              type: string
+              description: Response message for the payment.
+        bankDetails:
+          required:
+          - accountNumber
+          - country
+          type: object
+          properties:
+            country:
+              type: string
+              description: Country of the recipient institution. A valid [ISO 3166 Alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
+              x-cds-type: ExternalRef
+            accountNumber:
+              type: string
+              description: Account Targeted for payment.
+            bankAddress:
+              required:
+              - address
+              - name
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the recipient Bank.
+                address:
+                  type: string
+                  description: Address of the recipient Bank.
+            beneficiaryBankBIC:
+              type: string
+              description: Swift bank code. Aligns with standard [ISO 9362](https://www.iso.org/standard/60390.html).
+              x-cds-type: ExternalRef
+            fedWireNumber:
+              type: string
+              description: Number for Fedwire payment (Federal Reserve Wire Network).
+            sortCode:
+              type: string
+              description: Sort code used for account identification in some jurisdictions.
+            chipNumber:
+              type: string
+              description: Number for the Clearing House Interbank Payments System.
+            routingNumber:
+              type: string
+              description: International bank routing number.
+            legalEntityIdentifier:
+              type: string
+              description: The legal entity identifier (LEI) for the beneficiary. Aligns with [ISO 17442](https://www.iso.org/standard/59771.html).
+              x-cds-type: ExternalRef
+    BankingScheduledPaymentRecurrenceIntervalSchedule:
+      required:
+      - intervals
+      type: object
+      properties:
+        finalPaymentDate:
+          type: string
+          description: The limit date after which no more payments should be made using this schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value. If neither field is present the payments will continue indefinitely.
+          x-cds-type: DateString
+        paymentsRemaining:
+          type: integer
+          description: Indicates the number of payments remaining in the schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value, If neither field is present the payments will continue indefinitely.
+          example: 1
+          x-cds-type: PositiveInteger
+        nonBusinessDayTreatment:
+          type: string
+          description: Enumerated field giving the treatment where a scheduled payment date is not a business day. If absent assumed to be `ON`.<ul><li>`AFTER` - If a scheduled payment date is a non-business day the payment will be made on the first business day after the scheduled payment date.<li>`BEFORE` - If a scheduled payment date is a non-business day the payment will be made on the first business day before the scheduled payment date.<li>`ON` - If a scheduled payment date is a non-business day the payment will be made on that day regardless.<li>`ONLY` - Payments only occur on business days. If a scheduled payment date is a non-business day the payment will be ignored.</ul>
+          default: 'ON'
+          enum:
+          - AFTER
+          - BEFORE
+          - 'ON'
+          - ONLY
+        intervals:
+          type: array
+          description: An array of interval objects defining the payment schedule. Each entry in the array is additive, in that it adds payments to the overall payment schedule. If multiple intervals result in a payment on the same day then only one payment will be made. Must have at least one entry.
+          items:
+            $ref: '#/components/schemas/BankingScheduledPaymentInterval'
+      description: Indicates that the schedule of payments is defined by a series of intervals. Mandatory if the _recurrenceUType_ value is `intervalSchedule`.
+    ResponseErrorListV2:
+      type: object
+      required:
+      - errors
+      properties:
+        errors:
+          description: List of errors.
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorV2'
+    MetaPaginated:
+      required:
+      - totalPages
+      - totalRecords
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          description: The total number of records in the full set. See [pagination](#pagination).
+          x-cds-type: NaturalNumber
+        totalPages:
+          type: integer
+          description: The total number of pages in the full set. See [pagination](#pagination).
+          x-cds-type: NaturalNumber
+    BankingScheduledPaymentToV2:
+      required:
+      - toUType
+      type: object
+      properties:
+        toUType:
+          type: string
+          description: The type of object provided that specifies the destination of the funds for the payment.
+          enum:
+          - accountId
+          - biller
+          - digitalWallet
+          - domestic
+          - international
+          - payeeId
+        accountId:
+          description: Present if _toUType_ is set to `accountId`. Indicates that the payment is to another account that is accessible under the current consent.
+          allOf:
+          - $ref: '#/components/schemas/BankingAccountId'
+        payeeId:
+          description: Present if _toUType_ is set to `payeeId`. Indicates that the payment is to registered payee that can be accessed using the payee endpoint. If the Bank Payees scope has not been consented to then a _payeeId_ should not be provided and the full payee details should be provided instead.
+          allOf:
+          - $ref: '#/components/schemas/BankingPayeeId'
+        nickname:
+          type: string
+          description: The short display name of the payee as provided by the customer unless _toUType_ is set to `payeeId`. Where a customer has not provided a nickname, a display name derived by the bank for payee should be provided that is consistent with existing digital banking channels.
+        payeeReference:
+          type: string
+          description: The reference for the transaction, if applicable, that will be provided by the originating institution for the specific payment. If not empty, it overrides the value provided at the BankingScheduledPayment level.
+        digitalWallet:
+          $ref: '#/components/schemas/BankingDigitalWalletPayee'
+        domestic:
+          $ref: '#/components/schemas/BankingDomesticPayee'
+        biller:
+          $ref: '#/components/schemas/BankingBillerPayee'
+        international:
+          $ref: '#/components/schemas/BankingInternationalPayee'
+      description: Object containing details of the destination of the payment. Used to specify a variety of payment destination types.
+      x-conditional:
+      - accountId
+      - payeeId
+      - digitalWallet
+      - domestic
+      - biller
+      - international
+      - nickname
+      - payeeReference
+    BankingDigitalWalletPayee:
+      required:
+      - identifier
+      - name
+      - provider
+      - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: The display name of the wallet as given by the customer, else a default value defined by the data holder.
+        identifier:
+          type: string
+          description: The identifier of the digital wallet (dependent on type).
+        type:
+          type: string
+          description: The type of the digital wallet identifier.
+          enum:
+          - EMAIL
+          - CONTACT_NAME
+          - TELEPHONE
+        provider:
+          type: string
+          description: The provider of the digital wallet.
+          enum:
+          - PAYPAL_AU
+          - OTHER
     BankingInstalmentPlan:
       required:
       - accountId
@@ -268,74 +575,57 @@ components:
           description: Array of scheduled repayment amounts and dates.
           items:
             $ref: '#/components/schemas/BankingInstalmentPlanSchedule'
-    BankingInternationalPayee:
+    LinksPaginated:
       required:
-      - bankDetails
-      - beneficiaryDetails
+      - self
       type: object
       properties:
-        beneficiaryDetails:
-          required:
-          - country
-          type: object
-          properties:
-            name:
-              type: string
-              description: Name of the beneficiary.
-            country:
-              type: string
-              description: Country where the beneficiary resides. A valid [ISO 3166 Alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
-              x-cds-type: ExternalRef
-            message:
-              type: string
-              description: Response message for the payment.
-        bankDetails:
-          required:
-          - accountNumber
-          - country
-          type: object
-          properties:
-            country:
-              type: string
-              description: Country of the recipient institution. A valid [ISO 3166 Alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
-              x-cds-type: ExternalRef
-            accountNumber:
-              type: string
-              description: Account Targeted for payment.
-            bankAddress:
-              required:
-              - address
-              - name
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: Name of the recipient Bank.
-                address:
-                  type: string
-                  description: Address of the recipient Bank.
-            beneficiaryBankBIC:
-              type: string
-              description: Swift bank code. Aligns with standard [ISO 9362](https://www.iso.org/standard/60390.html).
-              x-cds-type: ExternalRef
-            fedWireNumber:
-              type: string
-              description: Number for Fedwire payment (Federal Reserve Wire Network).
-            sortCode:
-              type: string
-              description: Sort code used for account identification in some jurisdictions.
-            chipNumber:
-              type: string
-              description: Number for the Clearing House Interbank Payments System.
-            routingNumber:
-              type: string
-              description: International bank routing number.
-            legalEntityIdentifier:
-              type: string
-              description: The legal entity identifier (LEI) for the beneficiary. Aligns with [ISO 17442](https://www.iso.org/standard/59771.html).
-              x-cds-type: ExternalRef
-    Meta:
+        self:
+          type: string
+          description: Fully qualified link that generated the current response document.
+          x-cds-type: URIString
+        first:
+          type: string
+          description: URI to the first page of this set. Mandatory if this response is not the first page.
+          x-cds-type: URIString
+        prev:
+          type: string
+          description: URI to the previous page of this set. Mandatory if this response is not the first page.
+          x-cds-type: URIString
+        next:
+          type: string
+          description: URI to the next page of this set. Mandatory if this response is not the last page.
+          x-cds-type: URIString
+        last:
+          type: string
+          description: URI to the last page of this set. Mandatory if this response is not the last page.
+          x-cds-type: URIString
+      x-conditional:
+      - prev
+      - next
+      - first
+      - last
+    ResponseBankingScheduledPaymentsListV2:
+      required:
+      - data
+      - links
+      - meta
       type: object
+      properties:
+        data:
+          required:
+          - scheduledPayments
+          type: object
+          properties:
+            scheduledPayments:
+              type: array
+              description: The list of scheduled payments to return.
+              items:
+                $ref: '#/components/schemas/BankingScheduledPaymentV2'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
     BankingScheduledPaymentFrom:
       required:
       - accountId
@@ -346,6 +636,51 @@ components:
           allOf:
           - $ref: '#/components/schemas/BankingAccountId'
       description: Object containing details of the source of the payment. Currently only specifies an _accountId_ but provided as an object to facilitate future extensibility and consistency with the _to_ object.
+    BankingScheduledPaymentId:
+      type: string
+      description: A unique identifier for a Banking scheduled payment, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      x-cds-type: ASCIIString
+    BankingScheduledPaymentRecurrence:
+      required:
+      - recurrenceUType
+      type: object
+      properties:
+        nextPaymentDate:
+          type: string
+          description: The date of the next payment under the recurrence schedule.
+          x-cds-type: DateString
+        recurrenceUType:
+          type: string
+          description: The type of recurrence used to define the schedule.
+          enum:
+          - eventBased
+          - intervalSchedule
+          - lastWeekDay
+          - onceOff
+        onceOff:
+          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceOnceOff'
+        intervalSchedule:
+          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceIntervalSchedule'
+        lastWeekDay:
+          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceLastWeekday'
+        eventBased:
+          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceEventBased'
+      description: Object containing the detail of the schedule for the payment.
+      x-conditional:
+      - onceOff
+      - intervalSchedule
+      - lastWeekDay
+      - eventBased
+    BankingScheduledPaymentRecurrenceOnceOff:
+      required:
+      - paymentDate
+      type: object
+      properties:
+        paymentDate:
+          type: string
+          description: The scheduled date for the once off payment.
+          x-cds-type: DateString
+      description: Indicates that the payment is a once off payment on a specific future date. Mandatory if the _recurrenceUType_ value is `onceOff`.
     BankingDomesticPayeeCard:
       required:
       - cardNumber
@@ -355,33 +690,41 @@ components:
           type: string
           description: Name of the account to pay to.
           x-cds-type: MaskedPANString
-    BankingScheduledPaymentSetV2:
+    BankingScheduledPaymentInterval:
       required:
-      - to
+      - interval
       type: object
       properties:
-        to:
-          $ref: '#/components/schemas/BankingScheduledPaymentToV2'
-        isAmountCalculated:
-          type: boolean
-          description: Flag indicating whether the amount of the payment is calculated based on the context of the event. For instance a payment to reduce the balance of a credit card to zero. If absent then `false` is assumed.
-          default: false
-        amount:
+        interval:
           type: string
-          description: The amount of the next payment if known. Mandatory unless the _isAmountCalculated_ field is set to `true`. Must be zero or positive if present.
-          x-cds-type: AmountString
-        currency:
+          description: An interval for the payment. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax) with components less than a day in length ignored. This duration defines the period between payments starting with _nextPaymentDate_.
+          x-cds-type: ExternalRef
+        dayInInterval:
           type: string
-          description: The currency for the payment. `AUD` assumed if not present.
-          default: AUD
-          x-cds-type: CurrencyString
-      description: The set of payment amounts and destination accounts for this payment accommodating multi-part payments. A single entry indicates a simple payment with one destination account. Must have at least one entry.
-      x-conditional:
-      - amount
-    BankingAccountId:
+          description: Uses an interval to define the ordinal day within the interval defined by the interval field on which the payment occurs. If the resulting duration is 0 days in length or larger than the number of days in the interval then the payment will occur on the last day of the interval. A duration of 1 day indicates the first day of the interval. If absent the assumed value is `P1D`. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax) with components less than a day in length ignored. The first day of a week is considered to be Monday.
+          default: P1D
+          x-cds-type: ExternalRef
+    BankingInstalmentPlanId:
       type: string
-      description: A unique identifier for a Banking account, generated according to [CDR ID Permanence](#id-permanence) requirements.
+      description: A unique identifier for a Banking instalment plan, generated according to [CDR ID Permanence](#id-permanence) requirements.
       x-cds-type: ASCIIString
+    BankingBillerPayee:
+      required:
+      - billerCode
+      - billerName
+      type: object
+      properties:
+        billerCode:
+          type: string
+          description: BPAY Biller Code of the Biller.
+        crn:
+          type: string
+          description: BPAY CRN of the Biller (if available).<br/>Where the CRN contains sensitive information, it should be masked in line with how the Data Holder currently displays account identifiers in their existing online banking channels. If the contents of the CRN match the format of a Credit Card PAN they should be masked according to the rules applicable for [MaskedPANString](#common-field-types). If the contents are otherwise sensitive, then it should be masked using the rules applicable for the [MaskedAccountString](#common-field-types) common type.
+        billerName:
+          type: string
+          description: Name of the Biller.
+      x-conditional:
+      - crn
     BankingInstalmentPlanSchedule:
       required:
       - amountDue
@@ -427,393 +770,6 @@ components:
             urn:
               type: string
               description: The CDR error code URN which the application-specific error code extends. Mandatory if the error _code_ is an application-specific error rather than a standardised error code.
-    LinksPaginated:
-      required:
-      - self
-      type: object
-      properties:
-        self:
-          type: string
-          description: Fully qualified link that generated the current response document.
-          x-cds-type: URIString
-        first:
-          type: string
-          description: URI to the first page of this set. Mandatory if this response is not the first page.
-          x-cds-type: URIString
-        prev:
-          type: string
-          description: URI to the previous page of this set. Mandatory if this response is not the first page.
-          x-cds-type: URIString
-        next:
-          type: string
-          description: URI to the next page of this set. Mandatory if this response is not the last page.
-          x-cds-type: URIString
-        last:
-          type: string
-          description: URI to the last page of this set. Mandatory if this response is not the last page.
-          x-cds-type: URIString
-      x-conditional:
-      - prev
-      - next
-      - first
-      - last
-    ResponseBankingInstalmentPlanList:
-      required:
-      - data
-      - links
-      - meta
-      type: object
-      properties:
-        data:
-          required:
-          - plans
-          type: object
-          properties:
-            plans:
-              type: array
-              description: Array of instalment plans. An instalment plan describes the terms of repayment for a specified loan amount such as a Buy Now, Pay Later (BNPL) purchase or a specific card transaction.
-              items:
-                $ref: '#/components/schemas/BankingInstalmentPlan'
-        links:
-          $ref: '#/components/schemas/LinksPaginated'
-        meta:
-          $ref: '#/components/schemas/MetaPaginated'
-    BankingScheduledPaymentRecurrenceOnceOff:
-      required:
-      - paymentDate
-      type: object
-      properties:
-        paymentDate:
-          type: string
-          description: The scheduled date for the once off payment.
-          x-cds-type: DateString
-      description: Indicates that the payment is a once off payment on a specific future date. Mandatory if the _recurrenceUType_ value is `onceOff`.
-    BankingScheduledPaymentRecurrence:
-      required:
-      - recurrenceUType
-      type: object
-      properties:
-        nextPaymentDate:
-          type: string
-          description: The date of the next payment under the recurrence schedule.
-          x-cds-type: DateString
-        recurrenceUType:
-          type: string
-          description: The type of recurrence used to define the schedule.
-          enum:
-          - eventBased
-          - intervalSchedule
-          - lastWeekDay
-          - onceOff
-        onceOff:
-          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceOnceOff'
-        intervalSchedule:
-          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceIntervalSchedule'
-        lastWeekDay:
-          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceLastWeekday'
-        eventBased:
-          $ref: '#/components/schemas/BankingScheduledPaymentRecurrenceEventBased'
-      description: Object containing the detail of the schedule for the payment.
-      x-conditional:
-      - onceOff
-      - intervalSchedule
-      - lastWeekDay
-      - eventBased
-    BankingScheduledPaymentRecurrenceIntervalSchedule:
-      required:
-      - intervals
-      type: object
-      properties:
-        finalPaymentDate:
-          type: string
-          description: The limit date after which no more payments should be made using this schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value. If neither field is present the payments will continue indefinitely.
-          x-cds-type: DateString
-        paymentsRemaining:
-          type: integer
-          description: Indicates the number of payments remaining in the schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value, If neither field is present the payments will continue indefinitely.
-          example: 1
-          x-cds-type: PositiveInteger
-        nonBusinessDayTreatment:
-          type: string
-          description: Enumerated field giving the treatment where a scheduled payment date is not a business day. If absent assumed to be `ON`.<ul><li>`AFTER` - If a scheduled payment date is a non-business day the payment will be made on the first business day after the scheduled payment date.<li>`BEFORE` - If a scheduled payment date is a non-business day the payment will be made on the first business day before the scheduled payment date.<li>`ON` - If a scheduled payment date is a non-business day the payment will be made on that day regardless.<li>`ONLY` - Payments only occur on business days. If a scheduled payment date is a non-business day the payment will be ignored.</ul>
-          default: 'ON'
-          enum:
-          - AFTER
-          - BEFORE
-          - 'ON'
-          - ONLY
-        intervals:
-          type: array
-          description: An array of interval objects defining the payment schedule. Each entry in the array is additive, in that it adds payments to the overall payment schedule. If multiple intervals result in a payment on the same day then only one payment will be made. Must have at least one entry.
-          items:
-            $ref: '#/components/schemas/BankingScheduledPaymentInterval'
-      description: Indicates that the schedule of payments is defined by a series of intervals. Mandatory if the _recurrenceUType_ value is `intervalSchedule`.
-    BankingInstalmentPlanId:
-      type: string
-      description: A unique identifier for a Banking instalment plan, generated according to [CDR ID Permanence](#id-permanence) requirements.
-      x-cds-type: ASCIIString
-    BankingDigitalWalletPayee:
-      required:
-      - identifier
-      - name
-      - provider
-      - type
-      type: object
-      properties:
-        name:
-          type: string
-          description: The display name of the wallet as given by the customer, else a default value defined by the data holder.
-        identifier:
-          type: string
-          description: The identifier of the digital wallet (dependent on type).
-        type:
-          type: string
-          description: The type of the digital wallet identifier.
-          enum:
-          - EMAIL
-          - CONTACT_NAME
-          - TELEPHONE
-        provider:
-          type: string
-          description: The provider of the digital wallet.
-          enum:
-          - PAYPAL_AU
-          - OTHER
-    BankingScheduledPaymentToV2:
-      required:
-      - toUType
-      type: object
-      properties:
-        toUType:
-          type: string
-          description: The type of object provided that specifies the destination of the funds for the payment.
-          enum:
-          - accountId
-          - biller
-          - digitalWallet
-          - domestic
-          - international
-          - payeeId
-        accountId:
-          description: Present if _toUType_ is set to `accountId`. Indicates that the payment is to another account that is accessible under the current consent.
-          allOf:
-          - $ref: '#/components/schemas/BankingAccountId'
-        payeeId:
-          description: Present if _toUType_ is set to `payeeId`. Indicates that the payment is to registered payee that can be accessed using the payee endpoint. If the Bank Payees scope has not been consented to then a _payeeId_ should not be provided and the full payee details should be provided instead.
-          allOf:
-          - $ref: '#/components/schemas/BankingPayeeId'
-        nickname:
-          type: string
-          description: The short display name of the payee as provided by the customer unless _toUType_ is set to `payeeId`. Where a customer has not provided a nickname, a display name derived by the bank for payee should be provided that is consistent with existing digital banking channels.
-        payeeReference:
-          type: string
-          description: The reference for the transaction, if applicable, that will be provided by the originating institution for the specific payment. If not empty, it overrides the value provided at the BankingScheduledPayment level.
-        digitalWallet:
-          $ref: '#/components/schemas/BankingDigitalWalletPayee'
-        domestic:
-          $ref: '#/components/schemas/BankingDomesticPayee'
-        biller:
-          $ref: '#/components/schemas/BankingBillerPayee'
-        international:
-          $ref: '#/components/schemas/BankingInternationalPayee'
-      description: Object containing details of the destination of the payment. Used to specify a variety of payment destination types.
-      x-conditional:
-      - accountId
-      - payeeId
-      - digitalWallet
-      - domestic
-      - biller
-      - international
-      - nickname
-      - payeeReference
-    BankingScheduledPaymentRecurrenceEventBased:
-      required:
-      - description
-      type: object
-      properties:
-        description:
-          type: string
-          description: Description of the event and conditions that will result in the payment. Expected to be formatted for display to a customer.
-      description: Indicates that the schedule of payments is defined according to an external event that cannot be predetermined. Mandatory if the _recurrenceUType_ value is `eventBased`.
-    ResponseErrorListV2:
-      type: object
-      required:
-      - errors
-      properties:
-        errors:
-          description: List of errors.
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorV2'
-    MetaPaginated:
-      required:
-      - totalPages
-      - totalRecords
-      type: object
-      properties:
-        totalRecords:
-          type: integer
-          description: The total number of records in the full set. See [pagination](#pagination).
-          x-cds-type: NaturalNumber
-        totalPages:
-          type: integer
-          description: The total number of pages in the full set. See [pagination](#pagination).
-          x-cds-type: NaturalNumber
-    BankingProductCategoryV2:
-      type: string
-      description: The category to which a product or account belongs. See [here](#product-categories) for more details.
-      enum:
-      - BUSINESS_LOANS
-      - BUY_NOW_PAY_LATER
-      - CRED_AND_CHRG_CARDS
-      - LEASES
-      - MARGIN_LOANS
-      - OVERDRAFTS
-      - PERS_LOANS
-      - REGULATED_TRUST_ACCOUNTS
-      - RESIDENTIAL_MORTGAGES
-      - TERM_DEPOSITS
-      - TRADE_FINANCE
-      - TRANS_AND_SAVINGS_ACCOUNTS
-      - TRAVEL_CARDS
-    BankingDomesticPayee:
-      required:
-      - payeeAccountUType
-      type: object
-      properties:
-        payeeAccountUType:
-          type: string
-          description: 'Type of account object included. Valid values are: <ul><li>`account` A standard Australian account defined by BSB/Account Number.<li>`card` A credit or charge card to pay to (note that PANs are masked).<li>`payId` A PayID recognised by NPP.</ul>'
-          enum:
-          - account
-          - card
-          - payId
-        account:
-          $ref: '#/components/schemas/BankingDomesticPayeeAccount'
-        card:
-          $ref: '#/components/schemas/BankingDomesticPayeeCard'
-        payId:
-          $ref: '#/components/schemas/BankingDomesticPayeePayId'
-      x-conditional:
-      - account
-      - card
-      - payId
-    BankingScheduledPaymentRecurrenceLastWeekday:
-      required:
-      - interval
-      - lastWeekDay
-      type: object
-      properties:
-        finalPaymentDate:
-          type: string
-          description: The limit date after which no more payments should be made using this schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value. If neither field is present the payments will continue indefinitely.
-          x-cds-type: DateString
-        paymentsRemaining:
-          type: integer
-          description: Indicates the number of payments remaining in the schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value. If neither field is present the payments will continue indefinitely.
-          example: 1
-          x-cds-type: PositiveInteger
-        interval:
-          type: string
-          description: The interval for the payment. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax) with components less than a day in length ignored. This duration defines the period between payments starting with _nextPaymentDate_.
-          x-cds-type: ExternalRef
-        lastWeekDay:
-          type: string
-          description: The weekDay specified. The payment will occur on the last occurrence of this weekday in the interval.
-          enum:
-          - FRI
-          - MON
-          - SAT
-          - SUN
-          - THU
-          - TUE
-          - WED
-        nonBusinessDayTreatment:
-          type: string
-          description: Enumerated field giving the treatment where a scheduled payment date is not a business day. If absent assumed to be `ON`.<ul><li>`AFTER` - If a scheduled payment date is a non-business day the payment will be made on the first business day after the scheduled payment date.<li>`BEFORE` - If a scheduled payment date is a non-business day the payment will be made on the first business day before the scheduled payment date.<li>`ON` - If a scheduled payment date is a non-business day the payment will be made on that day regardless.<li>`ONLY` - Payments only occur on business days. If a scheduled payment date is a non-business day the payment will be ignored.</ul>
-          default: 'ON'
-          enum:
-          - AFTER
-          - BEFORE
-          - 'ON'
-          - ONLY
-      description: Indicates that the schedule of payments is defined according to the last occurrence of a specific weekday in an interval. Mandatory if the _recurrenceUType_ value is `lastWeekDay`.
-    BankingScheduledPaymentId:
-      type: string
-      description: A unique identifier for a Banking scheduled payment, generated according to [CDR ID Permanence](#id-permanence) requirements.
-      x-cds-type: ASCIIString
-    ResponseBankingScheduledPaymentsListV2:
-      required:
-      - data
-      - links
-      - meta
-      type: object
-      properties:
-        data:
-          required:
-          - scheduledPayments
-          type: object
-          properties:
-            scheduledPayments:
-              type: array
-              description: The list of scheduled payments to return.
-              items:
-                $ref: '#/components/schemas/BankingScheduledPaymentV2'
-        links:
-          $ref: '#/components/schemas/LinksPaginated'
-        meta:
-          $ref: '#/components/schemas/MetaPaginated'
-    RequestAccountIdListV1:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: object
-          required:
-          - accountIds
-          properties:
-            accountIds:
-              type: array
-              description: Array of _accountId_ values to obtain data for.
-              items:
-                $ref: '#/components/schemas/BankingAccountId'
-        meta:
-          $ref: '#/components/schemas/Meta'
-    BankingDomesticPayeePayId:
-      required:
-      - identifier
-      - type
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name assigned to the PayID by the owner of the PayID.
-        identifier:
-          type: string
-          description: The identifier of the PayID (dependent on type).
-        type:
-          type: string
-          description: The type of the PayID.
-          enum:
-          - ABN
-          - EMAIL
-          - ORG_IDENTIFIER
-          - TELEPHONE
-    BankingScheduledPaymentInterval:
-      required:
-      - interval
-      type: object
-      properties:
-        interval:
-          type: string
-          description: An interval for the payment. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax) with components less than a day in length ignored. This duration defines the period between payments starting with _nextPaymentDate_.
-          x-cds-type: ExternalRef
-        dayInInterval:
-          type: string
-          description: Uses an interval to define the ordinal day within the interval defined by the interval field on which the payment occurs. If the resulting duration is 0 days in length or larger than the number of days in the interval then the payment will occur on the last day of the interval. A duration of 1 day indicates the first day of the interval. If absent the assumed value is `P1D`. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax) with components less than a day in length ignored. The first day of a week is considered to be Monday.
-          default: P1D
-          x-cds-type: ExternalRef
     BankingScheduledPaymentV2:
       required:
       - from
@@ -854,137 +810,69 @@ components:
           $ref: '#/components/schemas/BankingScheduledPaymentRecurrence'
       x-conditional:
       - payeeReference
-    BankingBillerPayee:
+    ResponseBankingInstalmentPlanList:
       required:
-      - billerCode
-      - billerName
+      - data
+      - links
+      - meta
       type: object
       properties:
-        billerCode:
+        data:
+          required:
+          - plans
+          type: object
+          properties:
+            plans:
+              type: array
+              description: Array of instalment plans. An instalment plan describes the terms of repayment for a specified loan amount such as a Buy Now, Pay Later (BNPL) purchase or a specific card transaction.
+              items:
+                $ref: '#/components/schemas/BankingInstalmentPlan'
+        links:
+          $ref: '#/components/schemas/LinksPaginated'
+        meta:
+          $ref: '#/components/schemas/MetaPaginated'
+    BankingScheduledPaymentRecurrenceLastWeekday:
+      required:
+      - interval
+      - lastWeekDay
+      type: object
+      properties:
+        finalPaymentDate:
           type: string
-          description: BPAY Biller Code of the Biller.
-        crn:
+          description: The limit date after which no more payments should be made using this schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value. If neither field is present the payments will continue indefinitely.
+          x-cds-type: DateString
+        paymentsRemaining:
+          type: integer
+          description: Indicates the number of payments remaining in the schedule. If both _finalPaymentDate_ and _paymentsRemaining_ are present then payments will stop according to the most constraining value. If neither field is present the payments will continue indefinitely.
+          example: 1
+          x-cds-type: PositiveInteger
+        interval:
           type: string
-          description: BPAY CRN of the Biller (if available).<br/>Where the CRN contains sensitive information, it should be masked in line with how the Data Holder currently displays account identifiers in their existing online banking channels. If the contents of the CRN match the format of a Credit Card PAN they should be masked according to the rules applicable for [MaskedPANString](#common-field-types). If the contents are otherwise sensitive, then it should be masked using the rules applicable for the [MaskedAccountString](#common-field-types) common type.
-        billerName:
+          description: The interval for the payment. Formatted according to [ISO 8601 Durations](https://en.wikipedia.org/wiki/ISO_8601#Durations) (excludes recurrence syntax) with components less than a day in length ignored. This duration defines the period between payments starting with _nextPaymentDate_.
+          x-cds-type: ExternalRef
+        lastWeekDay:
           type: string
-          description: Name of the Biller.
-      x-conditional:
-      - crn
+          description: The weekDay specified. The payment will occur on the last occurrence of this weekday in the interval.
+          enum:
+          - FRI
+          - MON
+          - SAT
+          - SUN
+          - THU
+          - TUE
+          - WED
+        nonBusinessDayTreatment:
+          type: string
+          description: Enumerated field giving the treatment where a scheduled payment date is not a business day. If absent assumed to be `ON`.<ul><li>`AFTER` - If a scheduled payment date is a non-business day the payment will be made on the first business day after the scheduled payment date.<li>`BEFORE` - If a scheduled payment date is a non-business day the payment will be made on the first business day before the scheduled payment date.<li>`ON` - If a scheduled payment date is a non-business day the payment will be made on that day regardless.<li>`ONLY` - Payments only occur on business days. If a scheduled payment date is a non-business day the payment will be ignored.</ul>
+          default: 'ON'
+          enum:
+          - AFTER
+          - BEFORE
+          - 'ON'
+          - ONLY
+      description: Indicates that the schedule of payments is defined according to the last occurrence of a specific weekday in an interval. Mandatory if the _recurrenceUType_ value is `lastWeekDay`.
   responses:
-    ListInstalmentPlansBulk200:
-      description: Successful response
-      headers:
-        x-v:
-          $ref: '#/components/headers/XV'
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseBankingInstalmentPlanList'
-    ListScheduledPayments200:
-      description: Successful response
-      headers:
-        x-v:
-          $ref: '#/components/headers/XV'
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseBankingScheduledPaymentsListV2'
-    ListScheduledPaymentsBulk422:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPaymentsBulk406:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
     ListInstalmentPlans406:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPayments404:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListInstalmentPlans404:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPaymentsSpecificAccounts422:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li><li>[422 - Unavailable Banking Account](#error-422-authorisation-unavailable-banking-account)</li><li>[422 - Invalid Banking Account](#error-422-authorisation-invalid-banking-account)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListInstalmentPlansBulk406:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPaymentsSpecificAccounts400:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPaymentsSpecificAccounts406:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPaymentsBulk400:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPayments406:
       description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
       headers:
         x-fapi-interaction-id:
@@ -1004,6 +892,73 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ResponseBankingScheduledPaymentsListV2'
+    ListInstalmentPlans422:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPayments422:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListInstalmentPlansBulk406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPayments200:
+      description: Successful response
+      headers:
+        x-v:
+          $ref: '#/components/headers/XV'
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBankingScheduledPaymentsListV2'
+    ListInstalmentPlansBulk200:
+      description: Successful response
+      headers:
+        x-v:
+          $ref: '#/components/headers/XV'
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseBankingInstalmentPlanList'
+    ListInstalmentPlans400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPayments404:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
     ListScheduledPaymentsSpecificAccounts200:
       description: Successful response
       headers:
@@ -1024,42 +979,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ResponseErrorListV2'
-    ListInstalmentPlansBulk422:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListScheduledPayments422:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListInstalmentPlansBulk400:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
-    ListInstalmentPlans400:
-      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
-      headers:
-        x-fapi-interaction-id:
-          $ref: '#/components/headers/XFAPIInteractionId'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseErrorListV2'
     ListInstalmentPlans200:
       description: Successful response
       headers:
@@ -1071,7 +990,34 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ResponseBankingInstalmentPlanList'
-    ListInstalmentPlans422:
+    ListInstalmentPlansBulk400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListInstalmentPlans404:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[404 - Unavailable Banking Account](#error-404-authorisation-unavailable-banking-account)</li><li>[404 - Invalid Banking Account](#error-404-authorisation-invalid-banking-account)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPaymentsBulk406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPaymentsBulk422:
       description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
       headers:
         x-fapi-interaction-id:
@@ -1080,24 +1026,105 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPaymentsBulk400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListInstalmentPlansBulk422:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPaymentsSpecificAccounts406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPaymentsSpecificAccounts400:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[400 - Invalid Field](#error-400-field-invalid)</li><li>[400 - Missing Required Field](#error-400-field-missing)</li><li>[400 - Missing Required Header](#error-400-header-missing)</li><li>[400 - Invalid Version](#error-400-header-invalid-version)</li><li>[400 - Invalid Page Size](#error-400-field-invalid-page-size)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPaymentsSpecificAccounts422:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[422 - Invalid Page](#error-422-field-invalid-page)</li><li>[422 - Unavailable Banking Account](#error-422-authorisation-unavailable-banking-account)</li><li>[422 - Invalid Banking Account](#error-422-authorisation-invalid-banking-account)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
+    ListScheduledPayments406:
+      description: The following error codes **MUST** be supported:<br/><ul class="error-code-list"><li>[406 - Unsupported Version](#error-406-header-unsupported-version)</li></ul>
+      headers:
+        x-fapi-interaction-id:
+          $ref: '#/components/headers/XFAPIInteractionId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseErrorListV2'
   parameters:
+    QueryBankingProductCategory:
+      name: product-category
+      in: query
+      description: Used to filter results on the _productCategory_ field applicable to accounts. Any one of the valid values for this field can be supplied. If absent then all accounts returned.
+      schema:
+        $ref: '#/components/schemas/BankingProductCategoryV2'
+    HeaderXFAPICustomerIPAddress:
+      name: x-fapi-customer-ip-address
+      in: header
+      description: The customer's original IP address if the customer is currently logged in to the Data Recipient Software Product. The presence of this header indicates that the API is being called in a customer present context. Not to be included for unauthenticated calls.
+      schema:
+        type: string
+    QueryBankingAccountIsOwned:
+      name: is-owned
+      in: query
+      description: Filters accounts based on whether they are owned by the authorised customer. `true` for owned accounts, `false` for unowned accounts and absent for all accounts.
+      schema:
+        type: boolean
+    HeaderXMinV:
+      name: x-min-v
+      in: header
+      description: Minimum version of the API endpoint requested by the client. Must be set to a positive integer if provided. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`.
+      schema:
+        type: string
+    QueryPage:
+      name: page
+      in: query
+      description: Page of results to request (standard pagination).
+      schema:
+        type: integer
+        default: 1
+      x-cds-type: PositiveInteger
+    HeaderXFAPIAuthDate:
+      name: x-fapi-auth-date
+      in: header
+      description: The time when the customer last logged in to the Data Recipient Software Product as described in **[[FAPI-1.0-Baseline]](#nref-FAPI-1-0-Baseline)**. Required for all resource calls (customer present and unattended). Not required for unauthenticated calls.
+      schema:
+        type: string
+      x-conditional: true
     HeaderXV:
       name: x-v
       in: header
       description: Version of the API endpoint requested by the client. Must be set to a positive integer. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If the value of [_x-min-v_](#request-headers) is equal to or higher than the value of [_x-v_](#request-headers) then the [_x-min-v_](#request-headers) header should be treated as absent. If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`. See [HTTP Headers](#request-headers).
       required: true
-      schema:
-        type: string
-    HeaderXFAPIInteractionId:
-      name: x-fapi-interaction-id
-      in: header
-      description: An **[[RFC4122]](#nref-RFC4122)** UUID used as a correlation id. If provided, the data holder **MUST** play back this value in the _x-fapi-interaction-id_ response header. If not provided a **[[RFC4122]](#nref-RFC4122)** UUID value is required to be provided in the response header to track the interaction.
-      schema:
-        type: string
-    HeaderXMinV:
-      name: x-min-v
-      in: header
-      description: Minimum version of the API endpoint requested by the client. Must be set to a positive integer if provided. The endpoint should respond with the highest supported version between [_x-min-v_](#request-headers) and [_x-v_](#request-headers). If all versions requested are not supported then the endpoint **MUST** respond with a `406 Not Acceptable`.
       schema:
         type: string
     QueryPageSize:
@@ -1108,45 +1135,6 @@ components:
         type: integer
         default: 25
       x-cds-type: PositiveInteger
-    QueryBankingAccountIsOwned:
-      name: is-owned
-      in: query
-      description: Filters accounts based on whether they are owned by the authorised customer. `true` for owned accounts, `false` for unowned accounts and absent for all accounts.
-      schema:
-        type: boolean
-    HeaderXFAPIAuthDate:
-      name: x-fapi-auth-date
-      in: header
-      description: The time when the customer last logged in to the Data Recipient Software Product as described in **[[FAPI-1.0-Baseline]](#nref-FAPI-1-0-Baseline)**. Required for all resource calls (customer present and unattended). Not required for unauthenticated calls.
-      schema:
-        type: string
-      x-conditional: true
-    QueryPlanStatus:
-      name: plan-status
-      in: query
-      description: Allows for the filtering of plans based on their schedule status:<ul><li>`ACTIVE` requests plans where one or more scheduled instalments have _isPaid_ equal to `false`,</li><li>`INACTIVE` requests plans where all scheduled instalments have _isPaid_ equal to `true`,</li><li>`ALL` requests all `ACTIVE` and `INACTIVE` plans.</li></ul>
-      schema:
-        type: string
-        default: ACTIVE
-        enum:
-        - ACTIVE
-        - INACTIVE
-        - ALL
-    QueryPage:
-      name: page
-      in: query
-      description: Page of results to request (standard pagination).
-      schema:
-        type: integer
-        default: 1
-      x-cds-type: PositiveInteger
-    PathAccountId:
-      name: accountId
-      in: path
-      description: The _accountId_ to obtain data for. _accountId_ values are returned by account list endpoints.
-      required: true
-      schema:
-        $ref: '#/components/schemas/BankingAccountId'
     QueryBankingAccountOpenStatus:
       name: open-status
       in: query
@@ -1158,6 +1146,30 @@ components:
         - ALL
         - CLOSED
         - OPEN
+    PathAccountId:
+      name: accountId
+      in: path
+      description: The _accountId_ to obtain data for. _accountId_ values are returned by account list endpoints.
+      required: true
+      schema:
+        $ref: '#/components/schemas/BankingAccountId'
+    QueryPlanStatus:
+      name: plan-status
+      in: query
+      description: Allows for the filtering of plans based on their schedule status:<ul><li>`ACTIVE` requests plans where one or more scheduled instalments have _isPaid_ equal to `false`,</li><li>`INACTIVE` requests plans where all scheduled instalments have _isPaid_ equal to `true`,</li><li>`ALL` requests all `ACTIVE` and `INACTIVE` plans.</li></ul>
+      schema:
+        type: string
+        default: ACTIVE
+        enum:
+        - ACTIVE
+        - INACTIVE
+        - ALL
+    HeaderXFAPIInteractionId:
+      name: x-fapi-interaction-id
+      in: header
+      description: An **[[RFC4122]](#nref-RFC4122)** UUID used as a correlation id. If provided, the data holder **MUST** play back this value in the _x-fapi-interaction-id_ response header. If not provided a **[[RFC4122]](#nref-RFC4122)** UUID value is required to be provided in the response header to track the interaction.
+      schema:
+        type: string
     HeaderXCDSClientHeaders:
       name: x-cds-client-headers
       in: header
@@ -1166,26 +1178,6 @@ components:
         type: string
       x-conditional: true
       x-cds-type: Base64
-    HeaderXFAPICustomerIPAddress:
-      name: x-fapi-customer-ip-address
-      in: header
-      description: The customer's original IP address if the customer is currently logged in to the Data Recipient Software Product. The presence of this header indicates that the API is being called in a customer present context. Not to be included for unauthenticated calls.
-      schema:
-        type: string
-    QueryBankingProductCategory:
-      name: product-category
-      in: query
-      description: Used to filter results on the _productCategory_ field applicable to accounts. Any one of the valid values for this field can be supplied. If absent then all accounts returned.
-      schema:
-        $ref: '#/components/schemas/BankingProductCategoryV2'
-  requestBodies:
-    RequestAccountIds:
-      description: Request payload containing a list of _accountId_ values to obtain data for.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RequestAccountIdListV1'
-      required: true
   headers:
     XV:
       description: The [payload version](#response-headers) that the endpoint has responded with.
@@ -1197,3 +1189,11 @@ components:
       required: true
       schema:
         type: string
+  requestBodies:
+    RequestAccountIds:
+      description: Request payload containing a list of _accountId_ values to obtain data for.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestAccountIdListV1'
+      required: true
