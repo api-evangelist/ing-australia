@@ -1,4 +1,4 @@
-# ING Australia (ing-australia)
+# ING Australia
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,56 +64,131 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-ING Australia is the retail banking division of ING Bank (Australia) Limited (ABN 24 000 893 292), a wholly owned subsidiary of the Dutch multinational ING Groep N.V. headquartered in Amsterdam. Launched in 1999 as ING Direct and rebranded to ING in 2017, it is a branchless, digital-first direct bank offering everyday transaction and savings accounts, home loans, superannuation, and insurance to Australian consumers. It is a foreign-owned Authorised Deposit-taking Institution (ADI) — not a customer-owned mutual — regulated by APRA and ASIC, and an accredited data holder under Australia's Consumer Data Right (CDR / Open Banking).
+ING Australia is the retail banking division of ING Bank (Australia) Limited (ABN 24 000 893 292), a wholly owned subsidiary of the Dutch multinational ING Groep N.V. headquartered in Amsterdam. Launched in 1999 as ING Direct and rebranded to ING in 2017, it is a branchless, digital-first direct bank offering everyday transaction and savings accounts, home loans, superannuation, and insurance to Australian consumers. It is not a customer-owned mutual; it is a foreign-owned Authorised Deposit-taking Institution (ADI) regulated by APRA and ASIC. As an active ADI, ING is an accredited data holder under Australia's Consumer Data Right (CDR / Open Banking) and exposes the mandatory public, unauthenticated Product Reference Data (PRD) API conforming to the Consumer Data Standards (CDS). Authenticated consumer-data sharing follows the CDR ecosystem model (OAuth2 / OIDC FAPI profile via accredited data recipients); ING does not operate a broad, self-serve public developer portal.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/ing-australia/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/ing-australia/refs/heads/main/apis.yml)
+**Areas:** Finance · Banks · Open Banking · CDR · Consumer Banking · Australia · Product Reference Data · ADI
 
-## Tags
+## ING Australia on APIs.io
 
-- Financial
-- Banks
-- Open Banking
-- CDR
-- Consumer Banking
-- Australia
-- Product Reference Data
-- ADI
+Everything profiled for ING Australia is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/ing-australia/](https://apis.io/providers/ing-australia/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (7)
 
-- **Created:** 2026-07-20
-- **Modified:** 2026-07-20
+- [ING Australia Banking Account Balances API](https://apis.io/apis/ing-australia/ing-australia-banking-account-balances-api/) — Banking Account Balance endpoints
+- [ING Australia Banking Account Direct Debits API](https://apis.io/apis/ing-australia/ing-australia-banking-account-direct-debits-api/) — Banking Account Direct Debit endpoints
+- [ING Australia Banking Account Scheduled Payments API](https://apis.io/apis/ing-australia/ing-australia-banking-account-scheduled-payments-api/) — Banking Account Scheduled Payment endpoints
+- [ING Australia Banking Account Transactions API](https://apis.io/apis/ing-australia/ing-australia-banking-account-transactions-api/) — Banking Account Transaction endpoints
+- [ING Australia Banking Accounts API](https://apis.io/apis/ing-australia/ing-australia-banking-accounts-api/) — Banking Account endpoints
+- [ING Australia Banking Payees API](https://apis.io/apis/ing-australia/ing-australia-banking-payees-api/) — Banking Payee endpoints
+- [ING Australia Banking Products API](https://apis.io/apis/ing-australia/ing-australia-banking-products-api/) — Banking Product endpoints
 
-## APIs
+### Published properties
 
-### ING Australia CDR Product Reference Data API
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-Public, unauthenticated Product Reference Data (PRD) API mandated under Australia's Consumer Data Right. Exposes `GET /banking/products` (a paginated list of ING's publicly offered banking products) and `GET /banking/products/{productId}` (full product detail) under the Consumer Data Standards (CDS) path `/cds-au/v1`. Responses are versioned via the `x-v` request/response header. The base URI is ING Bank (Australia) Ltd's registered CDR `publicBaseUri` per the CDR Register.
+#### MCP servers (1)
 
-- **Human URL:** [https://www.ing.com.au/](https://www.ing.com.au/)
-- **Base URL:** `https://id.ob.ing.com.au/cds-au/v1`
+Model Context Protocol servers that expose the API to agents.
 
-#### Tags
+- [ing-australia-cds-banking](https://apis.io/servers/ing-australia/ing-australia-cds-banking/)
 
-- CDR
-- Open Banking
-- Product Reference Data
-- Banking
-- Consumer Data Standards
+#### Agentic access (1)
 
-#### Properties
+Which operations an agent can call, which act, and which need a human in the loop.
 
-- [Documentation](https://www.ing.com.au/pdf/CDR-policy.pdf)
-- [API Reference](https://consumerdatastandardsaustralia.github.io/standards/#product-reference-data-apis)
-- [OpenAPI](openapi/ing-australia-cds-banking-products-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
+- [Ing Australia Agentic Access](https://apis.io/agentic-access/ing-australia/ing-australia-agentic-access/)
 
-## Common Properties
+#### Collections (7)
+
+Postman and Open Collection request collections.
+
+- [CDR Banking Banking Account Balances API](https://apis.io/collections/ing-australia/open-ing-australia-banking-account-balances-api/)
+- [CDR Banking Banking Account Balances Banking Account Direct Debits API](https://apis.io/collections/ing-australia/open-ing-australia-banking-account-direct-debits-api/)
+- [CDR Banking Banking Account Balances Banking Account Scheduled Payments API](https://apis.io/collections/ing-australia/open-ing-australia-banking-account-scheduled-payments-api/)
+- [CDR Banking Banking Account Balances Banking Account Transactions API](https://apis.io/collections/ing-australia/open-ing-australia-banking-account-transactions-api/)
+- [CDR Banking Banking Account Balances Banking Accounts API](https://apis.io/collections/ing-australia/open-ing-australia-banking-accounts-api/)
+- [CDR Banking Banking Account Balances Banking Payees API](https://apis.io/collections/ing-australia/open-ing-australia-banking-payees-api/)
+- [CDR Banking Banking Account Balances Banking Products API](https://apis.io/collections/ing-australia/open-ing-australia-banking-products-api/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Ing Australia Cds Banking Products Overlay](https://apis.io/overlays/ing-australia/ing-australia-cds-banking-products-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Ing Australia Authentication](https://apis.io/security/ing-australia/ing-australia-authentication/)
+- [Ing Australia Domain Security](https://apis.io/security/ing-australia/ing-australia-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Ing Australia Scopes](https://apis.io/scopes/ing-australia/ing-australia-scopes/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.ing.com.au/)
 - [Documentation](https://www.ing.com.au/pdf/CDR-policy.pdf)
-- [API Reference](https://consumerdatastandardsaustralia.github.io/standards/)
+- [Getting started](https://www.ing.com.au/open-banking.html)
+- [API reference](https://consumerdatastandardsaustralia.github.io/standards/)
+- [Terms of service](https://www.ing.com.au/legal.html)
+- [Privacy policy](https://www.ing.com.au/privacy.html)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 37.2** — thin · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 44.7 |
+| Contract governance | 18.2 |
+| Operational transparency | 7.9 |
+| Developer ergonomics | 47.0 |
+| Access clarity | 21.1 |
+
+**Agent readiness 31.5** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | — |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+
+**Regulatory alignment 37.8** — Banking & Open Finance
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/ing-australia/](https://apis.io/providers/ing-australia/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for ING Australia: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/ing-australia/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
